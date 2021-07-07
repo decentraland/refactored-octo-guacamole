@@ -91,17 +91,24 @@ public class BuilderInWorldController : MonoBehaviour
     private Coroutine updateLandsWithAcessCoroutine;
     private Dictionary<string, string> catalogCallHeaders;
 
-    private void Awake()
+    private void InitReferences()
     {
-        BIWCatalogManager.Init();
-        builderInWorldBridge.OnCatalogHeadersReceived += CatalogHeadersReceived;
+        builderInWorldBridge = InitialSceneReferences.i.builderInWorldBridge;
+        cameraParentGO = InitialSceneReferences.i.cameraParent;
+        cursorGO = InitialSceneReferences.i.cursorCanvas;
+        inputController = InitialSceneReferences.i.inputController;
+
+        List<GameObject> grounds = new List<GameObject>();
+        for (int i = 0; i < InitialSceneReferences.i.groundVisual.transform.transform.childCount; i++)
+        {
+            grounds.Add(InitialSceneReferences.i.groundVisual.transform.transform.GetChild(i).gameObject);
+        }
+        groundVisualsGO = grounds.ToArray();
     }
 
-    void Start()
-    {
-        KernelConfig.i.EnsureConfigInitialized().Then(config =>  EnableFeature(config.features.enableBuilderInWorld));
-        KernelConfig.i.OnChange += OnKernelConfigChanged;
-    }
+    private void Awake() { BIWCatalogManager.Init(); }
+
+    private void Start() { EnableFeature(true); }
 
     private void OnDestroy()
     {
@@ -116,7 +123,6 @@ public class BuilderInWorldController : MonoBehaviour
         Environment.i.world.sceneController.OnNewSceneAdded -= NewSceneAdded;
         Environment.i.world.sceneController.OnReadyScene -= NewSceneReady;
 
-        KernelConfig.i.OnChange -= OnKernelConfigChanged;
 
         if (HUDController.i.builderInWorldMainHud != null)
         {
@@ -133,6 +139,7 @@ public class BuilderInWorldController : MonoBehaviour
 
         BuilderInWorldNFTController.i.OnNFTUsageChange -= OnNFTUsageChange;
         builderInWorldBridge.OnCatalogHeadersReceived -= CatalogHeadersReceived;
+        builderInWorldBridge.OnBuilderProjectInfo -= BuilderProjectPanelInfo;
         CleanItems();
 
         HUDController.i.OnBuilderProjectPanelCreation -= InitBuilderProjectPanel;
@@ -164,7 +171,7 @@ public class BuilderInWorldController : MonoBehaviour
         HUDController.i.builderInWorldMainHud.RefreshCatalogContent();
     }
 
-    private void OnKernelConfigChanged(KernelConfigModel current, KernelConfigModel previous) { EnableFeature(current.features.enableBuilderInWorld); }
+    private void BuilderProjectPanelInfo(string title, string description) { HUDController.i.builderInWorldMainHud.SetBuilderProjectInfo(title, description); }
 
     private void EnableFeature(bool enable)
     {
@@ -195,6 +202,10 @@ public class BuilderInWorldController : MonoBehaviour
             return;
 
         isInit = true;
+        InitReferences();
+
+        builderInWorldBridge.OnCatalogHeadersReceived += CatalogHeadersReceived;
+        builderInWorldBridge.OnBuilderProjectInfo -= BuilderProjectPanelInfo;
 
         userProfile = UserProfile.GetOwnUserProfile();
         if (!string.IsNullOrEmpty(userProfile.userId))
@@ -293,7 +304,7 @@ public class BuilderInWorldController : MonoBehaviour
     public void InitControllers()
     {
         builderInWorldEntityHandler.Init();
-        biwModeController.Init(editionGO, undoGO, snapGO, freeMovementGO);
+        biwModeController.Init();
         biwPublishController.Init();
         biwCreatorController.Init();
         outlinerController.Init();
@@ -302,6 +313,8 @@ public class BuilderInWorldController : MonoBehaviour
         biwSaveController.Init();
         actionController.Init();
         biwAudioHandler.Init();
+
+        biwModeController.SetEditorGameObjects(editionGO, undoGO, snapGO, freeMovementGO);
     }
 
     private void StartTutorial() { TutorialController.i.SetBuilderInWorldTutorialEnabled(); }

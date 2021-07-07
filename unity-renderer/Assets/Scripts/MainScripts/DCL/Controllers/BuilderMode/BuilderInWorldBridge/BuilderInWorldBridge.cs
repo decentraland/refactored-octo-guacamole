@@ -22,6 +22,7 @@ public class BuilderInWorldBridge : MonoBehaviour
     //events and probably dont need to get called with that frecuency
     public event Action OnKernelUpdated;
     public event Action<bool, string> OnPublishEnd;
+    public event Action<string, string> OnBuilderProjectInfo;
     public event Action<string> OnCatalogHeadersReceived;
 
     //This is done for optimization purposes, recreating new objects can increase garbage collection
@@ -60,7 +61,7 @@ public class BuilderInWorldBridge : MonoBehaviour
     public void BuilderProjectInfo(string payload)
     {
         builderProjectPayload = JsonUtility.FromJson<BuilderProjectPayload>(payload);
-        HUDController.i.builderInWorldMainHud.SetBuilderProjectInfo(builderProjectPayload.title, builderProjectPayload.description);
+        OnBuilderProjectInfo?.Invoke(builderProjectPayload.title, builderProjectPayload.description);
     }
 
     #endregion

@@ -79,6 +79,20 @@ namespace DCL.Camera
             camera.enabled = !visibleState;
         }
 
+        public bool TryGetCameraStateByType<T>(out CameraStateBase searchedCameraState)
+        {
+            foreach (CameraStateBase cameraMode in cameraModes)
+            {
+                if (cameraMode.GetType() == typeof(T))
+                {
+                    searchedCameraState = cameraMode;
+                    return true;
+                }
+            }
+            searchedCameraState = null;
+            return false;
+        }
+
         private void OnRenderingStateChanged(bool enabled, bool prevState) { camera.enabled = enabled; }
 
         private void CameraBlocked_OnChange(bool current, bool previous)
@@ -112,10 +126,7 @@ namespace DCL.Camera
             onSetCameraMode.Invoke(newMode);
         }
 
-        public CameraStateBase GetCameraMode( CameraMode.ModeId mode )
-        {
-            return cameraModes.FirstOrDefault( x => x.cameraModeId == mode );
-        }
+        public CameraStateBase GetCameraMode( CameraMode.ModeId mode ) { return cameraModes.FirstOrDefault( x => x.cameraModeId == mode ); }
 
         private void OnWorldReposition(Vector3 newValue, Vector3 oldValue) { transform.position += newValue - oldValue; }
 

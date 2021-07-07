@@ -36,7 +36,7 @@ public class BIWFloorHandler : BIWController
     private void Start()
     {
         builderInWorldEntityHandler.OnEntityDeleted += OnFloorEntityDeleted;
-        meshLoadIndicator.SetCamera(Camera.main);
+        meshLoadIndicator.SetCamera(InitialSceneReferences.i.mainCamera);
     }
 
     private void OnDestroy()

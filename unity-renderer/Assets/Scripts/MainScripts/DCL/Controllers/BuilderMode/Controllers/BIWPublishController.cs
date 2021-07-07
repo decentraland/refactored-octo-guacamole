@@ -1,3 +1,4 @@
+using DCL;
 using UnityEngine;
 
 public class BIWPublishController : BIWController
@@ -23,6 +24,9 @@ public class BIWPublishController : BIWController
             HUDController.i.builderInWorldMainHud.OnPublishAction += StartPublishFlow;
             HUDController.i.builderInWorldMainHud.OnConfirmPublishAction += StartPublishScene;
         }
+
+        builderInWorldBridge = InitialSceneReferences.i.builderInWorldBridge;
+
         if (builderInWorldBridge != null)
             builderInWorldBridge.OnPublishEnd += PublishEnd;
     }

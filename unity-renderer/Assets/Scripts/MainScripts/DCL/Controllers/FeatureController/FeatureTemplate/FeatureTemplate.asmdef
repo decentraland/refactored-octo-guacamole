@@ -1,9 +1,7 @@
 {
-    "name": "Audio",
+    "name": "FeatureTemplate",
     "rootNamespace": "",
-    "references": [
-        "GUID:b1087c5731ff68448a0a9c625bb7e52d"
-    ],
+    "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

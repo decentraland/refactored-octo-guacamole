@@ -93,6 +93,8 @@ public class BuilderInWorldEntityHandler : BIWController
         BuilderInWorldInputWrapper.OnMouseUp += OnInputMouseUp;
 
         DCL.Environment.i.world.sceneBoundsChecker.OnEntityBoundsCheckerStatusChanged += ChangeEntityBoundsCheckerStatus;
+
+        builderInWorldBridge = InitialSceneReferences.i.builderInWorldBridge;
     }
 
     private void OnInputMouseDown(int buttonId, Vector3 mousePosition)

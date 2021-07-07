@@ -35,7 +35,13 @@ public class BuilderInWorldMode : MonoBehaviour
 
     protected List<BuilderInWorldEntityAction> actionList = new List<BuilderInWorldEntityAction>();
 
-    public virtual void Init(GameObject goToEdit, GameObject undoGO, GameObject snapGO, GameObject freeMovementGO, List<DCLBuilderInWorldEntity> selectedEntities)
+    public virtual void Init()
+    {
+        gameObject.SetActive(false);
+        builderInWorldEntityHandler.OnEntityDeleted += OnDeleteEntity;
+    }
+
+    public virtual void SetEditorReferences(GameObject goToEdit, GameObject undoGO, GameObject snapGO, GameObject freeMovementGO, List<DCLBuilderInWorldEntity> selectedEntities)
     {
         editionGO = goToEdit;
         this.undoGO = undoGO;
@@ -43,8 +49,6 @@ public class BuilderInWorldMode : MonoBehaviour
         this.freeMovementGO = freeMovementGO;
 
         this.selectedEntities = selectedEntities;
-        gameObject.SetActive(false);
-        builderInWorldEntityHandler.OnEntityDeleted += OnDeleteEntity;
     }
 
     private void OnDestroy() { builderInWorldEntityHandler.OnEntityDeleted -= OnDeleteEntity; }

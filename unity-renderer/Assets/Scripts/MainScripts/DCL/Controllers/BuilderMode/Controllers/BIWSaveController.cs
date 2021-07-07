@@ -1,3 +1,4 @@
+using DCL;
 using DCL.Controllers;
 using UnityEngine;
 
@@ -18,6 +19,7 @@ public class BIWSaveController : BIWController
     {
         base.Init();
 
+        builderInWorldBridge = InitialSceneReferences.i.builderInWorldBridge;
         if (builderInWorldBridge != null)
             builderInWorldBridge.OnKernelUpdated += TryToSave;
 

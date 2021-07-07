@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using DCL;
+using UnityEngine;
 using DCL.Controllers;
 using DCL.Components;
 
@@ -25,6 +26,8 @@ namespace Builder
             gizmoMask = LayerMask.GetMask(LAYER_GIZMOS);
 
             groundPlane = new Plane(Vector3.up, Vector3.zero);
+            if (builderCamera == null)
+                builderCamera = InitialSceneReferences.i.mainCamera;
         }
 
         public void SetEntityHitPlane(float height) { entityHitPlane = new Plane(Vector3.up, new Vector3(0, height, 0)); }
