@@ -5,6 +5,8 @@ namespace Builder.MeshLoadIndicator
 {
     public class DCLBuilderMeshLoadIndicatorController : MonoBehaviour
     {
+        public DCLBuilderMeshLoadIndicator indicator => baseIndicator;
+
         [SerializeField] private DCLBuilderMeshLoadIndicator baseIndicator = null;
 
         private Queue<DCLBuilderMeshLoadIndicator> indicatorsAvailable;

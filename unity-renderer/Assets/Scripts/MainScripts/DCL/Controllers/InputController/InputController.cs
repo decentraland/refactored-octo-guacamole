@@ -43,7 +43,6 @@ public enum DCLAction_Trigger
     BuildEditModeToggleChangeCamera = 413,
     BuildEditModeToggleControls = 414,
     BuildEditModeToggleSnapMode = 415,
-    BuildEditModeCreateLastSceneObject = 416,
     BuildEditModeUndoAction = 417,
     BuildEditModeRedoAction = 418,
     BuildEditModeQuickBar1 = 419,

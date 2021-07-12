@@ -23,7 +23,7 @@ public class CatalogAssetPackAdapter : MonoBehaviour
         this.catalogItemPack = catalogItemPack;
         titleTxt.text = this.catalogItemPack.title;
 
-        if (catalogItemPack.id != BuilderInWorldSettings.ASSETS_COLLECTIBLES)
+        if (catalogItemPack.id != BIWSettings.ASSETS_COLLECTIBLES)
         {
             GetThumbnail();
         }

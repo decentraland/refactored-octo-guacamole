@@ -5,21 +5,25 @@ using UnityEngine;
 
 public class BIWModeControllerShould : IntegrationTestSuite_Legacy
 {
-    private BuilderInWorldController controller;
     private BIWModeController biwModeController;
 
     protected override IEnumerator SetUp()
     {
         yield return base.SetUp();
-        controller = Resources.FindObjectsOfTypeAll<BuilderInWorldController>()[0];
 
-        controller.InitGameObjects();
-        controller.FindSceneToEdit();
-        controller.InitControllers();
+        biwModeController = new BIWModeController();
 
-        biwModeController = controller.biwModeController;
+        BIWActionController actionController = new BIWActionController();
+        var referencesController = BIWTestHelper.CreateReferencesControllerWithGenericMocks(
+            actionController,
+            biwModeController
+        );
+
+        biwModeController.Init(referencesController);
+        actionController.Init(referencesController);
+
         biwModeController.EnterEditMode(scene);
-
+        actionController.EnterEditMode(scene);
     }
 
     [Test]
@@ -33,7 +37,7 @@ public class BIWModeControllerShould : IntegrationTestSuite_Legacy
 
         //Assert
         Assert.IsTrue(biwModeController.GetCurrentStateMode() == BIWModeController.EditModeState.FirstPerson);
-        Assert.IsTrue(biwModeController.GetCurrentMode() == biwModeController.firstPersonMode);
+        Assert.IsTrue(biwModeController.GetCurrentMode().GetType() == typeof(BuilderInWorldFirstPersonMode));
     }
 
     [Test]
@@ -47,7 +51,7 @@ public class BIWModeControllerShould : IntegrationTestSuite_Legacy
 
         //Assert
         Assert.IsTrue(biwModeController.GetCurrentStateMode() == BIWModeController.EditModeState.GodMode);
-        Assert.IsTrue(biwModeController.GetCurrentMode() == biwModeController.editorMode);
+        Assert.IsTrue(biwModeController.GetCurrentMode().GetType() == typeof(BuilderInWorldGodMode));
     }
 
     [Test]
@@ -66,7 +70,7 @@ public class BIWModeControllerShould : IntegrationTestSuite_Legacy
 
     protected override IEnumerator TearDown()
     {
-        controller.CleanItems();
+        biwModeController.Dispose();
         yield return base.TearDown();
     }
 }

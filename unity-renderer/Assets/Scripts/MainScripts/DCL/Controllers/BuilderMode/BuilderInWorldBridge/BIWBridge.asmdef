@@ -1,0 +1,27 @@
+{
+    "name": "BIWBridge",
+    "rootNamespace": "",
+    "references": [
+        "GUID:4973650d2444c4561a15d50f24d91cd9",
+        "GUID:a881b57670b1d2747a6d7f9e32b63230",
+        "GUID:fbcc413e192ef9048811d47ab0aca0c0",
+        "GUID:e555144732b726c4cba5b0f6337fea75",
+        "GUID:92d421569a4b2234c837b61c50b146c8",
+        "GUID:cc6bfabbfe87b7949aa248893f89ce37",
+        "GUID:97d8897529779cb49bebd400c7f402a6",
+        "GUID:4720e174f2805c74bb7aa94cc8bb5bf8",
+        "GUID:a78c5d8dad39efe45ab1b21901f8db0f",
+        "GUID:7976cbc9190edcd4e97c09878faa7d9b",
+        "GUID:99cea83ca76dcd846abed7e61a8c90bd",
+        "GUID:1dd0780aa6be12b428c8005d0bee46b8"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -287,7 +287,7 @@ public class SceneCatalogController : ISceneCatalogController
         }
 
         isShowingAssetPacks = true;
-        sceneCatalogView.SetCatalogTitle(BuilderInWorldSettings.CATALOG_ASSET_PACK_TITLE);
+        sceneCatalogView.SetCatalogTitle(BIWSettings.CATALOG_ASSET_PACK_TITLE);
 
         if (sceneCatalogView.catalogGroupList != null)
             sceneCatalogView.catalogGroupList.gameObject.SetActive(false);
@@ -307,7 +307,7 @@ public class SceneCatalogController : ISceneCatalogController
         }
 
         isShowingAssetPacks = true;
-        sceneCatalogView.SetCatalogTitle(BuilderInWorldSettings.CATALOG_ASSET_PACK_TITLE);
+        sceneCatalogView.SetCatalogTitle(BIWSettings.CATALOG_ASSET_PACK_TITLE);
         RefreshCatalog();
 
         if (sceneCatalogView.catalogGroupList != null)

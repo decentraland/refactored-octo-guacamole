@@ -72,7 +72,7 @@ public class SceneLimitsController : ISceneLimitsController
         }
         else
         {
-            sceneLimitsView.SetTitleText(BuilderInWorldSettings.CUSTOM_LAND);
+            sceneLimitsView.SetTitleText(BIWSettings.CUSTOM_LAND);
         }
 
         SceneMetricsModel limits = currentParcelScene.metricsController.GetLimits();

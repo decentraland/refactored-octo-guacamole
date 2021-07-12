@@ -175,7 +175,7 @@ namespace Tests.BuildModeHUDViews
         public void SetTranslateActiveGizmosCorrectly()
         {
             //Arrange
-            string gizmosActive = BuilderInWorldSettings.TRANSLATE_GIZMO_NAME;
+            string gizmosActive = BIWSettings.TRANSLATE_GIZMO_NAME;
 
             // Act
             topActionsButtonsView.SetGizmosActive(gizmosActive);
@@ -190,7 +190,7 @@ namespace Tests.BuildModeHUDViews
         public void SetRotateActiveGizmosCorrectly()
         {
             //Arrange
-            string gizmosActive = BuilderInWorldSettings.ROTATE_GIZMO_NAME;
+            string gizmosActive = BIWSettings.ROTATE_GIZMO_NAME;
 
             // Act
             topActionsButtonsView.SetGizmosActive(gizmosActive);
@@ -205,7 +205,7 @@ namespace Tests.BuildModeHUDViews
         public void SetScaleActiveGizmosCorrectly()
         {
             //Arrange
-            string gizmosActive = BuilderInWorldSettings.SCALE_GIZMO_NAME;
+            string gizmosActive = BIWSettings.SCALE_GIZMO_NAME;
 
             // Act
             topActionsButtonsView.SetGizmosActive(gizmosActive);
@@ -220,7 +220,7 @@ namespace Tests.BuildModeHUDViews
         public void SetEmptyGizmosCorrectly()
         {
             //Arrange
-            string gizmosActive = BuilderInWorldSettings.EMPTY_GIZMO_NAME;
+            string gizmosActive = BIWSettings.EMPTY_GIZMO_NAME;
 
             // Act
             topActionsButtonsView.SetGizmosActive(gizmosActive);

@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BuilderInWorldAudioHandler : BIWController
+public class BuilderInWorldAudioHandler : MonoBehaviour
 {
     const float MUSIC_DELAY_TIME_ON_START = 4f;
     const float MUSIC_FADE_OUT_TIME_ON_EXIT = 5f;
@@ -19,7 +19,7 @@ public class BuilderInWorldAudioHandler : BIWController
     BuilderInWorldController inWorldController;
 
     [SerializeField]
-    BuilderInWorldEntityHandler entityHandler;
+    BIWEntityHandler entityHandler;
 
     [SerializeField]
     BIWModeController modeController;
@@ -94,9 +94,8 @@ public class BuilderInWorldAudioHandler : BIWController
         entityHandler.OnEntitySelected -= OnAssetSelect;
     }
 
-    public override void EnterEditMode(ParcelScene scene)
+    public void EnterEditMode(ParcelScene scene)
     {
-        base.EnterEditMode(scene);
 
         UpdateEntityCount();
         CoroutineStarter.Start(StartBuilderMusic());
@@ -106,10 +105,8 @@ public class BuilderInWorldAudioHandler : BIWController
         gameObject.SetActive(true);
     }
 
-    public override void ExitEditMode()
+    public void ExitEditMode()
     {
-        base.ExitEditMode();
-
         eventBuilderExit.Play();
         CoroutineStarter.Start(eventBuilderMusic.FadeOut(MUSIC_FADE_OUT_TIME_ON_EXIT));
         if (HUDController.i.builderInWorldMainHud != null)

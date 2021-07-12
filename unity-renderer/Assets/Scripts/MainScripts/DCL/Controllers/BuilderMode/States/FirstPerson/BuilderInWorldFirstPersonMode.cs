@@ -7,20 +7,15 @@ using UnityEngine;
 
 public class BuilderInWorldFirstPersonMode : BuilderInWorldMode
 {
-    [Header("Design variables")]
-    public float scaleSpeed = 0.25f;
-    public float rotationSpeed = 0.5f;
-    public float distanceFromCameraForNewEntitties = 5;
+    private float scaleSpeed = 0.25f;
+    private float rotationSpeed = 0.5f;
+    private float distanceFromCameraForNewEntitties = 5;
 
-    [Header("Prefab references")]
-    public BuilderInWorldInputWrapper builderInputWrapper;
-
-    [Header("InputActions")]
-    [SerializeField] internal InputAction_Hold rotationHold;
+    private InputAction_Hold rotationHold;
 
     private Quaternion initialRotation;
 
-    private float currentScaleAdded, currentYRotationAdded;
+    private float currentYRotationAdded;
 
     private bool snapObjectAlreadyMoved = false, shouldRotate = false;
     private Transform originalParentGOEdit;
@@ -28,27 +23,43 @@ public class BuilderInWorldFirstPersonMode : BuilderInWorldMode
     private InputAction_Hold.Started rotationHoldStartDelegate;
     private InputAction_Hold.Finished rotationHoldFinishedDelegate;
 
-    private void Start()
+    public override void Init(BIWReferencesController biwReferencesController)
     {
+        base.Init(biwReferencesController);
+        maxDistanceToSelectEntitiesValue = biwReferencesController.firstPersonDynamicVariables.maxDistanceToSelectEntities;
+
+        snapFactor = biwReferencesController.firstPersonDynamicVariables.snapFactor;
+        snapRotationDegresFactor = biwReferencesController.firstPersonDynamicVariables.snapRotationDegresFactor;
+        snapScaleFactor =  biwReferencesController.firstPersonDynamicVariables.snapScaleFactor;
+        snapDistanceToActivateMovement =  biwReferencesController.firstPersonDynamicVariables.snapDistanceToActivateMovement;
+
+        scaleSpeed =  biwReferencesController.firstPersonDynamicVariables.scaleSpeed;
+        rotationSpeed =  biwReferencesController.firstPersonDynamicVariables.rotationSpeed;
+        distanceFromCameraForNewEntitties =  biwReferencesController.firstPersonDynamicVariables.distanceFromCameraForNewEntitties;
+
+        rotationHold = biwReferencesController.inputsReferences.firstPersonRotationHold;
+
         rotationHoldStartDelegate = (action) => { shouldRotate = true; };
         rotationHoldFinishedDelegate = (action) => { shouldRotate = false; };
 
         rotationHold.OnStarted += rotationHoldStartDelegate;
         rotationHold.OnFinished += rotationHoldFinishedDelegate;
 
-        BuilderInWorldInputWrapper.OnMouseClick += OnMouseClick;
+        BIWInputWrapper.OnMouseClick += OnMouseClick;
     }
 
-    private void OnDestroy()
+    public override void Dispose()
     {
+        base.Dispose();
         rotationHold.OnStarted -= rotationHoldStartDelegate;
         rotationHold.OnFinished -= rotationHoldFinishedDelegate;
 
-        BuilderInWorldInputWrapper.OnMouseClick -= OnMouseClick;
+        BIWInputWrapper.OnMouseClick -= OnMouseClick;
     }
 
-    void LateUpdate()
+    public override void LateUpdate()
     {
+        base.LateUpdate();
         if (selectedEntities.Count == 0 || isMultiSelectionActive)
             return;
 
@@ -84,12 +95,11 @@ public class BuilderInWorldFirstPersonMode : BuilderInWorldMode
             Quaternion lookOnLook = Quaternion.LookRotation(editionGO.transform.position - pointToLookAt);
             freeMovementGO.transform.rotation = lookOnLook;
         }
-
     }
 
     public override Vector3 GetPointerPosition() { return new Vector3(Screen.width / 2, Screen.height / 2, 0); }
 
-    public void OnMouseClick(int buttonId, Vector3 mouseposition)
+    private void OnMouseClick(int buttonId, Vector3 mouseposition)
     {
         if (!isModeActive)
             return;
@@ -103,7 +113,7 @@ public class BuilderInWorldFirstPersonMode : BuilderInWorldMode
 
     public override bool ShouldCancelUndoAction()
     {
-        if (builderInWorldEntityHandler.GetSelectedEntityList().Count >= 1)
+        if (biwEntityHandler.GetSelectedEntityList().Count >= 1)
         {
             UndoSelection();
             return true;
@@ -111,10 +121,10 @@ public class BuilderInWorldFirstPersonMode : BuilderInWorldMode
         return false;
     }
 
-    public void UndoSelection()
+    private void UndoSelection()
     {
         BuilderInWorldUtils.CopyGameObjectStatus(undoGO, editionGO, false, false);
-        builderInWorldEntityHandler.DeselectEntities();
+        biwEntityHandler.DeselectEntities();
     }
 
     public override void SetDuplicationOffset(float offset)
@@ -127,7 +137,6 @@ public class BuilderInWorldFirstPersonMode : BuilderInWorldMode
     public override void ResetScaleAndRotation()
     {
         base.ResetScaleAndRotation();
-        currentScaleAdded = 0;
         currentYRotationAdded = 0;
 
         Quaternion zeroAnglesQuaternion = Quaternion.Euler(Vector3.zero);
@@ -239,7 +248,6 @@ public class BuilderInWorldFirstPersonMode : BuilderInWorldMode
                 ScaleSelection(-scaleSpeed);
             }
         }
-
     }
 
     public override Vector3 GetCreatedEntityPoint() { return Camera.main.transform.position + Camera.main.transform.forward * distanceFromCameraForNewEntitties; }
@@ -269,7 +277,6 @@ public class BuilderInWorldFirstPersonMode : BuilderInWorldMode
         {
             editionGO.transform.SetParent(null);
         }
-
     }
 
     private void SetEditObjectParent()
@@ -294,9 +301,8 @@ public class BuilderInWorldFirstPersonMode : BuilderInWorldMode
         else
         {
             if (!isSnapActive)
-            {
                 parentToAsign = originalParentGOEdit;
-            }
+
             worldPositionStays = true;
         }
 
@@ -314,7 +320,6 @@ public class BuilderInWorldFirstPersonMode : BuilderInWorldMode
 
     void ScaleSelection(float scaleFactor)
     {
-        currentScaleAdded += scaleFactor;
         editionGO.transform.localScale += Vector3.one * scaleFactor;
         snapGO.transform.localScale += Vector3.one * scaleFactor;
     }

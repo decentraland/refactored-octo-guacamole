@@ -2,13 +2,21 @@ using Builder;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using DCL.Controllers;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class BuilderInWorldInputWrapper : MonoBehaviour
+public interface IBIWInputWrapper
 {
-    public float msClickThreshold = 200;
-    public float movementClickThreshold = 50;
+    public void StopInput();
+
+    public void ResumeInput();
+}
+
+public class BIWInputWrapper : BIWController, IBIWInputWrapper
+{
+    private const float MS_CLICK_THRESHOLD = 500;
+    private const float MOVEMENT_CLICK_THRESHOLD = 50;
 
     public static event Action<int, Vector3> OnMouseClick;
     public static event Action<int, Vector3> OnMouseClickOnUI;
@@ -28,9 +36,14 @@ public class BuilderInWorldInputWrapper : MonoBehaviour
     private Vector3 lastMousePosition;
     private bool canInputBeMade = true;
     private bool currentClickIsOnUi = false;
+    private GameObject builderInputGameObject;
 
-    private void Awake()
+    public override void Init(BIWReferencesController referencesController)
     {
+        base.Init(referencesController);
+        builderInputGameObject = new GameObject("BuilderInput");
+        builderInputGameObject.AddComponent<DCLBuilderInput>();
+
         DCLBuilderInput.OnMouseDrag += MouseDrag;
         DCLBuilderInput.OnMouseRawDrag += MouseRawDrag;
         DCLBuilderInput.OnMouseWheel += MouseWheel;
@@ -38,13 +51,28 @@ public class BuilderInWorldInputWrapper : MonoBehaviour
         DCLBuilderInput.OnMouseUp += MouseUp;
     }
 
-    private void OnDestroy()
+    public override void Dispose()
     {
+        base.Dispose();
         DCLBuilderInput.OnMouseDrag -= MouseDrag;
         DCLBuilderInput.OnMouseRawDrag -= MouseRawDrag;
         DCLBuilderInput.OnMouseWheel -= MouseWheel;
         DCLBuilderInput.OnMouseDown -= MouseDown;
         DCLBuilderInput.OnMouseUp -= MouseUp;
+
+        GameObject.Destroy(builderInputGameObject);
+    }
+
+    public override void EnterEditMode(ParcelScene scene)
+    {
+        base.EnterEditMode(scene);
+        builderInputGameObject.SetActive(true);
+    }
+
+    public override void ExitEditMode()
+    {
+        base.ExitEditMode();
+        builderInputGameObject.SetActive(false);
     }
 
     public void StopInput() { canInputBeMade = false; }
@@ -66,9 +94,9 @@ public class BuilderInWorldInputWrapper : MonoBehaviour
         if (!BuilderInWorldUtils.IsPointerOverUIElement())
         {
             OnMouseUp?.Invoke(buttonId, mousePosition);
-            if (Vector3.Distance(mousePosition, lastMousePosition) >= movementClickThreshold)
+            if (Vector3.Distance(mousePosition, lastMousePosition) >= MOVEMENT_CLICK_THRESHOLD)
                 return;
-            if (Time.unscaledTime >= lastTimeMouseDown + msClickThreshold / 1000)
+            if (Time.unscaledTime >= lastTimeMouseDown + MS_CLICK_THRESHOLD / 1000)
                 return;
             OnMouseClick?.Invoke(buttonId, mousePosition);
         }

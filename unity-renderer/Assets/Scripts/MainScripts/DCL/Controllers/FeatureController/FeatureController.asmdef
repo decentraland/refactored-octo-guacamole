@@ -1,0 +1,20 @@
+{
+    "name": "FeatureController",
+    "rootNamespace": "",
+    "references": [
+        "GUID:bd51ff2b035ce4ab4be7c38c43c88889",
+        "GUID:7fe146b43e76fe745aeaf2020feb54b7",
+        "GUID:c44f6fd10d3d94432a107d581e0096b5",
+        "GUID:e99faafecbf8dd74d8130597511b9b27",
+        "GUID:0f686f1bcb4670a4bb2929a41daaf716"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -14,13 +14,12 @@ public class BIWOutlinerShould : IntegrationTestSuite_Legacy
 {
     private const string ENTITY_ID = "1";
     private DCLBuilderInWorldEntity entity;
+    private BIWEntityHandler entityHandler;
     private BIWOutlinerController outlinerController;
 
     protected override IEnumerator SetUp()
     {
         yield return base.SetUp();
-        BuilderInWorldController controller = Resources.FindObjectsOfTypeAll<BuilderInWorldController>()[0];
-        outlinerController = controller.outlinerController;
 
         TestHelpers.CreateSceneEntity(scene, ENTITY_ID);
 
@@ -32,8 +31,22 @@ public class BIWOutlinerShould : IntegrationTestSuite_Legacy
 
         LoadWrapper gltfShape = GLTFShape.GetLoaderForEntity(scene.entities[ENTITY_ID]);
         yield return new DCL.WaitUntil(() => gltfShape.alreadyLoaded);
-        controller.builderInWorldEntityHandler.EnterEditMode(scene);
-        entity = controller.builderInWorldEntityHandler.GetConvertedEntity(scene.entities[ENTITY_ID]);
+
+        outlinerController = new BIWOutlinerController();
+        entityHandler = new BIWEntityHandler();
+
+        var referencesController = BIWTestHelper.CreateReferencesControllerWithGenericMocks(
+            outlinerController,
+            entityHandler
+        );
+
+        outlinerController.Init(referencesController);
+        entityHandler.Init(referencesController);
+
+        entityHandler.EnterEditMode(scene);
+        outlinerController.EnterEditMode(scene);
+
+        entity = entityHandler.GetConvertedEntity(scene.entities[ENTITY_ID]);
     }
 
     [Test]
@@ -50,10 +63,10 @@ public class BIWOutlinerShould : IntegrationTestSuite_Legacy
     public void OutlineLayer()
     {
         outlinerController.OutlineEntity(entity);
-        Assert.AreEqual(entity.rootEntity.meshesInfo.renderers[0].gameObject.layer, BuilderInWorldSettings.SELECTION_LAYER);
+        Assert.AreEqual(entity.rootEntity.meshesInfo.renderers[0].gameObject.layer, BIWSettings.SELECTION_LAYER);
 
         outlinerController.CancelEntityOutline(entity);
-        Assert.AreNotEqual(entity.rootEntity.meshesInfo.renderers[0].gameObject.layer, BuilderInWorldSettings.SELECTION_LAYER);
+        Assert.AreNotEqual(entity.rootEntity.meshesInfo.renderers[0].gameObject.layer, BIWSettings.SELECTION_LAYER);
     }
 
     [Test]
@@ -62,5 +75,12 @@ public class BIWOutlinerShould : IntegrationTestSuite_Legacy
         entity.SetIsLockedValue(true);
         outlinerController.OutlineEntity(entity);
         Assert.IsFalse(outlinerController.IsEntityOutlined(entity));
+    }
+
+    protected override IEnumerator TearDown()
+    {
+        outlinerController.Dispose();
+        entityHandler.Dispose();
+        yield return base.TearDown();
     }
 }

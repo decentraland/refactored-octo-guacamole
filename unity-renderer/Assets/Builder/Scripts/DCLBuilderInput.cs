@@ -7,7 +7,7 @@ namespace Builder
         const string MouseXAxis = "Mouse X";
         const string MouseYAxis = "Mouse Y";
 
-        [SerializeField] float mouseWheelThrottle = 0.1f;
+        private const float MOUSE_WHEEL_THROTTLE = 0.1f;
 
         public delegate void MouseClickDelegate(int buttonId, Vector3 mousePosition);
 
@@ -68,7 +68,7 @@ namespace Builder
             int axisDirection = (int)Mathf.Sign(axisValue);
             if (lastMouseWheelAxisDirection == axisDirection)
             {
-                if (Time.unscaledTime - lastMouseWheelTime >= mouseWheelThrottle)
+                if (Time.unscaledTime - lastMouseWheelTime >= MOUSE_WHEEL_THROTTLE)
                 {
                     SetMouseWheelDelta(axisValue, axisDirection);
                 }

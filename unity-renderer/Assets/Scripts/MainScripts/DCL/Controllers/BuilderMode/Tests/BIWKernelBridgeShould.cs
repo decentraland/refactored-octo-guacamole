@@ -10,7 +10,7 @@ using UnityEngine.TestTools;
 public class BIWKernelBridgeShould : IntegrationTestSuite_Legacy
 {
     private BuilderInWorldBridge biwBridge;
-    private BuilderInWorldEntityHandler entityHandler;
+    private BIWEntityHandler entityHandler;
     private GameObject dummyGameObject;
 
     private bool messageReceived = false;
@@ -19,9 +19,8 @@ public class BIWKernelBridgeShould : IntegrationTestSuite_Legacy
     protected override IEnumerator SetUp()
     {
         yield return base.SetUp();
-        BuilderInWorldController controller = Resources.FindObjectsOfTypeAll<BuilderInWorldController>()[0];
-        entityHandler = controller.builderInWorldEntityHandler;
-        entityHandler.Init();
+        entityHandler = new BIWEntityHandler();
+        entityHandler.Init(BIWTestHelper.CreateMockUpReferenceController());
         entityHandler.EnterEditMode(scene);
 
         dummyGameObject = new GameObject();
@@ -118,7 +117,7 @@ public class BIWKernelBridgeShould : IntegrationTestSuite_Legacy
     public void TestSmartItemComponentKernelUpdate()
     {
         //Arrange
-        DCLBuilderInWorldEntity entity =  BuilderInWorldTestHelper.CreateSmartItemEntity(entityHandler, scene, null);
+        DCLBuilderInWorldEntity entity =  BIWTestHelper.CreateSmartItemEntity(entityHandler, scene, null);
 
         //Act
         biwBridge.UpdateSmartItemComponent(entity, scene);

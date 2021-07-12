@@ -51,7 +51,7 @@ namespace Builder.Gizmos
             return Vector3.zero;
         }
 
-        public void ForceRelativeScaleRatio() { relativeScaleRatio = new Vector3(BuilderInWorldSettings.GIZMOS_RELATIVE_SCALE_RATIO, BuilderInWorldSettings.GIZMOS_RELATIVE_SCALE_RATIO, BuilderInWorldSettings.GIZMOS_RELATIVE_SCALE_RATIO); }
+        public void ForceRelativeScaleRatio() { relativeScaleRatio = new Vector3(BIWSettings.GIZMOS_RELATIVE_SCALE_RATIO, BIWSettings.GIZMOS_RELATIVE_SCALE_RATIO, BIWSettings.GIZMOS_RELATIVE_SCALE_RATIO); }
 
         public string GetGizmoType() { return gizmoType; }
 

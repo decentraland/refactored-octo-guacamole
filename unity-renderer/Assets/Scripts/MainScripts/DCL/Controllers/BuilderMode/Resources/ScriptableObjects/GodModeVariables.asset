@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 594c49836c3ebe24986e500d5f941c7c, type: 3}
+  m_Name: GodModeVariables
+  m_EditorClassIdentifier: 
+  maxDistanceToSelectEntities: 9999
+  snapFactor: 0.5
+  snapRotationDegresFactor: 0.261799
+  snapScaleFactor: 0.5
+  snapDistanceToActivateMovement: 0.1
+  initialEagleCameraHeight: 10
+  initialEagleCameraDistance: 10
+  initialEagleCameraLookAtHeight: 0
+  layerToStopClick:
+    serializedVersion: 2
+    m_Bits: 2048
+  snapDragFactor: 0.5

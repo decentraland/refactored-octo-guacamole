@@ -278,10 +278,10 @@ public class BuildModeHUDController : IHUD
         controllers.buildModeConfirmationModalController.OnConfirmExit += ConfirmPublishModal;
 
         ConfigureConfirmationModal(
-            BuilderInWorldSettings.PUBLISH_MODAL_TITLE,
-            BuilderInWorldSettings.PUBLISH_MODAL_SUBTITLE,
-            BuilderInWorldSettings.PUBLISH_MODAL_CANCEL_BUTTON,
-            BuilderInWorldSettings.PUBLISH_MODAL_CONFIRM_BUTTON);
+            BIWSettings.PUBLISH_MODAL_TITLE,
+            BIWSettings.PUBLISH_MODAL_SUBTITLE,
+            BIWSettings.PUBLISH_MODAL_CANCEL_BUTTON,
+            BIWSettings.PUBLISH_MODAL_CONFIRM_BUTTON);
 
         controllers.buildModeConfirmationModalController.SetActive(true, BuildModeModalType.PUBLISH);
         controllers.publicationDetailsController.SetActive(false);

@@ -12,38 +12,24 @@ using Environment = DCL.Environment;
 
 public class BuilderInWorldGodMode : BuilderInWorldMode
 {
-    [Header("Editor Design")]
-    public float initialEagleCameraHeight = 10f;
-    public float initialEagleCameraDistance = 10f;
-    public float initialEagleCameraLookAtHeight = 0f;
+    private float initialEagleCameraHeight = 10f;
+    private float initialEagleCameraDistance = 10f;
+    private float initialEagleCameraLookAtHeight = 0f;
 
-    public LayerMask layerToStopClick;
-    public float snapDragFactor = 5f;
+    private float snapDragFactor = 5f;
+    private FreeCameraMovement freeCameraController;
 
-    [Header("Scenes References")]
-    public FreeCameraMovement freeCameraController;
+    private CameraController cameraController;
+    private Transform lookAtT;
+    private MouseCatcher mouseCatcher;
+    private PlayerAvatarController avatarRenderer;
+    private DCLBuilderGizmoManager gizmoManager;
+    private IBIWOutlinerController outlinerController;
 
-    public CameraController cameraController;
-    public Transform lookAtT;
-    public MouseCatcher mouseCatcher;
-    public PlayerAvatarController avatarRenderer;
-
-    [Header("Prefab References")]
-    public DCLBuilderGizmoManager gizmoManager;
-
-    public VoxelController voxelController;
-    public BIWOutlinerController outlinerController;
-
-    [Header("InputActions")]
-    [SerializeField]
-    internal InputAction_Trigger focusOnSelectedEntitiesInputAction;
-
-    [SerializeField]
-    internal InputAction_Hold multiSelectionInputAction;
+    private InputAction_Trigger focusOnSelectedEntitiesInputAction;
+    private InputAction_Hold multiSelectionInputAction;
 
     private ParcelScene sceneToEdit;
-
-    public LayerMask groundLayer;
 
     private bool isPlacingNewObject = false;
     private bool mouseMainBtnPressed = false;
@@ -61,38 +47,85 @@ public class BuilderInWorldGodMode : BuilderInWorldMode
 
     private Vector3 lastMousePosition;
     private Vector3 dragStartedPoint;
+    private GameObject builderGO;
 
     public const float RAYCAST_MAX_DISTANCE = 10000f;
 
-    private void Start()
+    public override void Init(BIWReferencesController biwReferencesController)
     {
+        base.Init(biwReferencesController);
+
+        lookAtT = new GameObject("BIWGodModeTransform").transform;
+        maxDistanceToSelectEntitiesValue = biwReferencesController.godModeDynamicVariables.maxDistanceToSelectEntities;
+
+        snapFactor = biwReferencesController.godModeDynamicVariables.snapFactor;
+        snapRotationDegresFactor = biwReferencesController.godModeDynamicVariables.snapRotationDegresFactor;
+        snapScaleFactor =  biwReferencesController.godModeDynamicVariables.snapScaleFactor;
+        snapDistanceToActivateMovement =  biwReferencesController.godModeDynamicVariables.snapDistanceToActivateMovement;
+
+        initialEagleCameraHeight = biwReferencesController.godModeDynamicVariables.initialEagleCameraHeight;
+        initialEagleCameraDistance = biwReferencesController.godModeDynamicVariables.initialEagleCameraDistance;
+        initialEagleCameraLookAtHeight = biwReferencesController.godModeDynamicVariables.initialEagleCameraHeight;
+
+        snapDragFactor = biwReferencesController.godModeDynamicVariables.snapDragFactor;
+
+        outlinerController = biwReferencesController.biwOutlinerController;
+
+        if (HUDController.i.builderInWorldMainHud != null)
+        {
+            HUDController.i.builderInWorldMainHud.OnTranslateSelectedAction += TranslateMode;
+            HUDController.i.builderInWorldMainHud.OnRotateSelectedAction += RotateMode;
+            HUDController.i.builderInWorldMainHud.OnScaleSelectedAction += ScaleMode;
+            HUDController.i.builderInWorldMainHud.OnSelectedObjectPositionChange += UpdateSelectionPosition;
+            HUDController.i.builderInWorldMainHud.OnSelectedObjectRotationChange += UpdateSelectionRotation;
+            HUDController.i.builderInWorldMainHud.OnSelectedObjectScaleChange += UpdateSelectionScale;
+            HUDController.i.builderInWorldMainHud.OnResetCameraAction += ResetCamera;
+            HUDController.i.builderInWorldMainHud.OnPublishAction += TakeSceneScreenshotForPublish;
+        }
+
+        if (InitialSceneReferences.i.cameraController.TryGetCameraStateByType<FreeCameraMovement>(out CameraStateBase cameraState))
+            freeCameraController = (FreeCameraMovement) cameraState;
+        mouseCatcher = InitialSceneReferences.i.mouseCatcher;
+        avatarRenderer = InitialSceneReferences.i.playerAvatarController;
+        cameraController = InitialSceneReferences.i.cameraController;
+
         DCLBuilderGizmoManager.OnGizmoTransformObjectEnd += OnGizmosTransformEnd;
         DCLBuilderGizmoManager.OnGizmoTransformObjectStart += OnGizmosTransformStart;
 
-        BuilderInWorldInputWrapper.OnMouseDown += OnInputMouseDown;
-        BuilderInWorldInputWrapper.OnMouseUp += OnInputMouseUp;
-        BuilderInWorldInputWrapper.OnMouseUpOnUI += OnInputMouseUpOnUi;
-        BuilderInWorldInputWrapper.OnMouseDrag += OnInputMouseDrag;
+        BIWInputWrapper.OnMouseDown += OnInputMouseDown;
+        BIWInputWrapper.OnMouseUp += OnInputMouseUp;
+        BIWInputWrapper.OnMouseUpOnUI += OnInputMouseUpOnUi;
+        BIWInputWrapper.OnMouseDrag += OnInputMouseDrag;
+
+        focusOnSelectedEntitiesInputAction = biwReferencesController.inputsReferences.focusOnSelectedEntitiesInputAction;
+        multiSelectionInputAction = biwReferencesController.inputsReferences.multiSelectionInputAction;
 
         focusOnSelectedEntitiesInputAction.OnTriggered += (o) => FocusOnSelectedEntitiesInput();
 
         multiSelectionInputAction.OnStarted += (o) => ChangeSnapTemporaryActivated();
         multiSelectionInputAction.OnFinished += (o) => ChangeSnapTemporaryDeactivated();
 
+        builderGO = GameObject.Instantiate(biwReferencesController.projectReferences.godModeBuilderPrefab, biwReferencesController.projectReferences.godModeBuilderPrefab.transform.position, biwReferencesController.projectReferences.godModeBuilderPrefab.transform.rotation);
+        gizmoManager = builderGO.GetComponentInChildren<DCLBuilderGizmoManager>();
+
         gizmoManager.OnChangeTransformValue += EntitiesTransfromByGizmos;
     }
 
-    private void OnDestroy()
+    public override void Dispose()
     {
+        base.Dispose();
         DCLBuilderGizmoManager.OnGizmoTransformObjectEnd -= OnGizmosTransformEnd;
         DCLBuilderGizmoManager.OnGizmoTransformObjectStart -= OnGizmosTransformStart;
 
-        BuilderInWorldInputWrapper.OnMouseDown -= OnInputMouseDown;
-        BuilderInWorldInputWrapper.OnMouseUp -= OnInputMouseUp;
-        BuilderInWorldInputWrapper.OnMouseUpOnUI -= OnInputMouseUpOnUi;
-        BuilderInWorldInputWrapper.OnMouseDrag -= OnInputMouseDrag;
+        BIWInputWrapper.OnMouseDown -= OnInputMouseDown;
+        BIWInputWrapper.OnMouseUp -= OnInputMouseUp;
+        BIWInputWrapper.OnMouseUpOnUI -= OnInputMouseUpOnUi;
+        BIWInputWrapper.OnMouseDrag -= OnInputMouseDrag;
 
         gizmoManager.OnChangeTransformValue -= EntitiesTransfromByGizmos;
+
+        GameObject.Destroy(lookAtT.gameObject);
+        GameObject.Destroy(builderGO);
 
         if (HUDController.i.builderInWorldMainHud == null)
             return;
@@ -107,20 +140,18 @@ public class BuilderInWorldGodMode : BuilderInWorldMode
         HUDController.i.builderInWorldMainHud.OnPublishAction -= TakeSceneScreenshotForPublish;
     }
 
-    private void Update()
+    public override void Update()
     {
+        base.Update();
         if (isPlacingNewObject)
         {
-            if (!voxelController.IsActive())
-                SetEditObjectAtMouse();
-            else
-                voxelController.SetEditObjectLikeVoxel();
+            SetEditObjectAtMouse();
         }
         else if (isSquareMultiSelectionInputActive && isMouseDragging)
         {
             List<DCLBuilderInWorldEntity> allEntities = null;
 
-            allEntities = builderInWorldEntityHandler.GetAllEntitiesFromCurrentScene();
+            allEntities = biwEntityHandler.GetAllEntitiesFromCurrentScene();
 
             foreach (DCLBuilderInWorldEntity entity in allEntities)
             {
@@ -139,8 +170,9 @@ public class BuilderInWorldGodMode : BuilderInWorldMode
         }
     }
 
-    private void OnGUI()
+    public override void OnGUI()
     {
+        base.OnGUI();
         if (mouseMainBtnPressed && isSquareMultiSelectionInputActive)
         {
             var rect = BuilderInWorldUtils.GetScreenRect(lastMousePosition, Input.mousePosition);
@@ -169,7 +201,7 @@ public class BuilderInWorldGodMode : BuilderInWorldMode
 
     private void EntitiesTransfromByGizmos(Vector3 transformValue)
     {
-        if (gizmoManager.GetSelectedGizmo() != BuilderInWorldSettings.ROTATE_GIZMO_NAME)
+        if (gizmoManager.GetSelectedGizmo() != BIWSettings.ROTATE_GIZMO_NAME)
             return;
 
         foreach (DCLBuilderInWorldEntity entity in selectedEntities)
@@ -183,13 +215,13 @@ public class BuilderInWorldGodMode : BuilderInWorldMode
         if (selectedEntities.Count != 1)
             return;
 
-        TransformActionStarted(selectedEntities[0].rootEntity, BuilderInWorldSettings.TRANSLATE_GIZMO_NAME);
+        TransformActionStarted(selectedEntities[0].rootEntity, BIWSettings.TRANSLATE_GIZMO_NAME);
         editionGO.transform.position = WorldStateUtils.ConvertSceneToUnityPosition(newPosition, sceneToEdit);
         UpdateGizmosToSelectedEntities();
-        TransformActionEnd(selectedEntities[0].rootEntity, BuilderInWorldSettings.TRANSLATE_GIZMO_NAME);
+        TransformActionEnd(selectedEntities[0].rootEntity, BIWSettings.TRANSLATE_GIZMO_NAME);
         ActionFinish(BuildInWorldCompleteAction.ActionType.MOVE);
-        builderInWorldEntityHandler.ReportTransform(true);
-        biwSaveController.ForceSave();
+        biwEntityHandler.ReportTransform(true);
+        biwSaveController.TryToSave();
     }
 
     public void UpdateSelectionRotation(Vector3 rotation)
@@ -197,12 +229,12 @@ public class BuilderInWorldGodMode : BuilderInWorldMode
         if (selectedEntities.Count != 1)
             return;
 
-        TransformActionStarted(selectedEntities[0].rootEntity, BuilderInWorldSettings.ROTATE_GIZMO_NAME);
+        TransformActionStarted(selectedEntities[0].rootEntity, BIWSettings.ROTATE_GIZMO_NAME);
         selectedEntities[0].transform.rotation = Quaternion.Euler(rotation);
-        TransformActionEnd(selectedEntities[0].rootEntity, BuilderInWorldSettings.ROTATE_GIZMO_NAME);
+        TransformActionEnd(selectedEntities[0].rootEntity, BIWSettings.ROTATE_GIZMO_NAME);
         ActionFinish(BuildInWorldCompleteAction.ActionType.ROTATE);
-        builderInWorldEntityHandler.ReportTransform(true);
-        biwSaveController.ForceSave();
+        biwEntityHandler.ReportTransform(true);
+        biwSaveController.TryToSave();
     }
 
     public void UpdateSelectionScale(Vector3 scale)
@@ -212,17 +244,17 @@ public class BuilderInWorldGodMode : BuilderInWorldMode
 
         var entityToUpdate = selectedEntities[0];
 
-        TransformActionStarted(entityToUpdate.rootEntity, BuilderInWorldSettings.SCALE_GIZMO_NAME);
+        TransformActionStarted(entityToUpdate.rootEntity, BIWSettings.SCALE_GIZMO_NAME);
         // Before change the scale, we unparent the entity to not to make it dependant on the editionGO and after that, reparent it
         entityToUpdate.transform.SetParent(null);
         entityToUpdate.transform.localScale = scale;
         editionGO.transform.localScale = Vector3.one;
         entityToUpdate.transform.SetParent(editionGO.transform);
 
-        TransformActionEnd(entityToUpdate.rootEntity, BuilderInWorldSettings.SCALE_GIZMO_NAME);
+        TransformActionEnd(entityToUpdate.rootEntity, BIWSettings.SCALE_GIZMO_NAME);
         ActionFinish(BuildInWorldCompleteAction.ActionType.SCALE);
-        builderInWorldEntityHandler.ReportTransform(true);
-        biwSaveController.ForceSave();
+        biwEntityHandler.ReportTransform(true);
+        biwSaveController.TryToSave();
     }
 
     public void UpdateGizmosToSelectedEntities()
@@ -236,30 +268,12 @@ public class BuilderInWorldGodMode : BuilderInWorldMode
         gizmoManager.SetSelectedEntities(editionGO.transform, editableEntities);
     }
 
-    public override void Init(GameObject goToEdit, GameObject undoGo, GameObject snapGO, GameObject freeMovementGO, List<DCLBuilderInWorldEntity> selectedEntities)
-    {
-        base.Init(goToEdit, undoGo, snapGO, freeMovementGO, selectedEntities);
-        voxelController.SetEditionGO(goToEdit);
-
-        if (HUDController.i.builderInWorldMainHud != null)
-        {
-            HUDController.i.builderInWorldMainHud.OnTranslateSelectedAction += TranslateMode;
-            HUDController.i.builderInWorldMainHud.OnRotateSelectedAction += RotateMode;
-            HUDController.i.builderInWorldMainHud.OnScaleSelectedAction += ScaleMode;
-            HUDController.i.builderInWorldMainHud.OnSelectedObjectPositionChange += UpdateSelectionPosition;
-            HUDController.i.builderInWorldMainHud.OnSelectedObjectRotationChange += UpdateSelectionRotation;
-            HUDController.i.builderInWorldMainHud.OnSelectedObjectScaleChange += UpdateSelectionScale;
-            HUDController.i.builderInWorldMainHud.OnResetCameraAction += ResetCamera;
-            HUDController.i.builderInWorldMainHud.OnPublishAction += TakeSceneScreenshotForPublish;
-        }
-    }
-
     public override void MouseClickDetected()
     {
         if (isPlacingNewObject)
         {
-            builderInWorldEntityHandler.DeselectEntities();
-            biwSaveController.ForceSave();
+            biwEntityHandler.DeselectEntities();
+            biwSaveController.TryToSave();
             return;
         }
 
@@ -270,13 +284,13 @@ public class BuilderInWorldGodMode : BuilderInWorldMode
 
     private void OnInputMouseDrag(int buttonId, Vector3 mousePosition, float axisX, float axisY)
     {
-        if (Vector3.Distance(lastMousePosition, mousePosition) <= BuilderInWorldSettings.MOUSE_THRESHOLD_FOR_DRAG && !isMouseDragging)
+        if (Vector3.Distance(lastMousePosition, mousePosition) <= BIWSettings.MOUSE_THRESHOLD_FOR_DRAG && !isMouseDragging)
             return;
 
         isMouseDragging = true;
         if (buttonId != 0 ||
             selectedEntities.Count <= 0 ||
-            BuilderInWorldUtils.IsPointerOverMaskElement(layerToStopClick) ||
+            BuilderInWorldUtils.IsPointerOverMaskElement(BIWSettings.GIZMOS_LAYER) ||
             isSquareMultiSelectionInputActive)
             return;
 
@@ -332,7 +346,7 @@ public class BuilderInWorldGodMode : BuilderInWorldMode
         {
             mouseSecondaryBtnPressed = false;
             if (CanCancelAction(position))
-                builderInWorldEntityHandler.CancelSelection();
+                biwEntityHandler.CancelSelection();
 
             freeCameraController.StopDetectingMovement();
         }
@@ -373,10 +387,10 @@ public class BuilderInWorldGodMode : BuilderInWorldMode
         if (isPlacingNewObject)
             return;
 
-        var entity = builderInWorldEntityHandler.GetEntityOnPointer();
+        var entity = biwEntityHandler.GetEntityOnPointer();
         if ((entity == null
              || (entity != null && !entity.IsSelected))
-            && !BuilderInWorldUtils.IsPointerOverMaskElement(layerToStopClick))
+            && !BuilderInWorldUtils.IsPointerOverMaskElement(BIWSettings.GIZMOS_LAYER))
         {
             isSquareMultiSelectionInputActive = true;
             outlinerController.SetOutlineCheckActive(false);
@@ -392,7 +406,7 @@ public class BuilderInWorldGodMode : BuilderInWorldMode
     {
         if (isSquareMultiSelectionInputActive && mouseMainBtnPressed )
         {
-            if (Vector3.Distance(lastMousePosition, position) >= BuilderInWorldSettings.MOUSE_THRESHOLD_FOR_DRAG)
+            if (Vector3.Distance(lastMousePosition, position) >= BIWSettings.MOUSE_THRESHOLD_FOR_DRAG)
                 EndBoundMultiSelection();
 
             isSquareMultiSelectionInputActive = false;
@@ -400,13 +414,12 @@ public class BuilderInWorldGodMode : BuilderInWorldMode
         }
     }
 
-    private bool CanCancelAction(Vector3 currentMousePosition) { return Vector3.Distance(lastMousePosition, currentMousePosition) <= BuilderInWorldSettings.MOUSE_THRESHOLD_FOR_DRAG && !freeCameraController.HasBeenMovement; }
+    private bool CanCancelAction(Vector3 currentMousePosition) { return Vector3.Distance(lastMousePosition, currentMousePosition) <= BIWSettings.MOUSE_THRESHOLD_FOR_DRAG && !freeCameraController.HasBeenMovement; }
 
     private void StarDraggingSelectedEntities()
     {
-        if (!builderInWorldEntityHandler.IsPointerInSelectedEntity() ||
-            gizmoManager.HasAxisHover() ||
-            voxelController.IsActive())
+        if (!biwEntityHandler.IsPointerInSelectedEntity() ||
+            gizmoManager.HasAxisHover())
             return;
 
         if (gizmoManager.isActiveAndEnabled)
@@ -426,7 +439,7 @@ public class BuilderInWorldGodMode : BuilderInWorldMode
         if (wasGizmosActive && !isPlacingNewObject)
         {
             gizmoManager.ShowGizmo();
-            biwSaveController.ForceSave();
+            biwSaveController.TryToSave();
         }
 
         wasGizmosActive = false;
@@ -442,13 +455,13 @@ public class BuilderInWorldGodMode : BuilderInWorldMode
         freeCameraController.SetCameraCanMove(true);
         List<DCLBuilderInWorldEntity> allEntities = null;
 
-        allEntities = builderInWorldEntityHandler.GetAllEntitiesFromCurrentScene();
+        allEntities = biwEntityHandler.GetAllEntitiesFromCurrentScene();
 
         List<DCLBuilderInWorldEntity> selectedInsideBoundsEntities = new List<DCLBuilderInWorldEntity>();
         int alreadySelectedEntities = 0;
 
         if (!isMultiSelectionActive)
-            builderInWorldEntityHandler.DeselectEntities();
+            biwEntityHandler.DeselectEntities();
 
         foreach (DCLBuilderInWorldEntity entity in allEntities)
         {
@@ -460,7 +473,7 @@ public class BuilderInWorldGodMode : BuilderInWorldMode
                     if (entity.IsSelected)
                         alreadySelectedEntities++;
 
-                    builderInWorldEntityHandler.SelectEntity(entity);
+                    biwEntityHandler.SelectEntity(entity);
                     selectedInsideBoundsEntities.Add(entity);
                 }
             }
@@ -470,33 +483,23 @@ public class BuilderInWorldGodMode : BuilderInWorldMode
         {
             foreach (DCLBuilderInWorldEntity entity in selectedInsideBoundsEntities)
             {
-                builderInWorldEntityHandler.DeselectEntity(entity);
+                biwEntityHandler.DeselectEntity(entity);
             }
         }
 
         outlinerController.CancelAllOutlines();
     }
 
-    #region Voxel
-
-    public void ActivateVoxelMode() { voxelController.SetActiveMode(true); }
-
-    public void DesactivateVoxelMode() { voxelController.SetActiveMode(false); }
-
-    #endregion
-
     public override void Activate(ParcelScene scene)
     {
         base.Activate(scene);
-        gameObject.SetActive(true);
         sceneToEdit = scene;
-        voxelController.SetSceneToEdit(scene);
 
         if (activateCamera)
             ActivateCamera(scene);
 
         if (gizmoManager.GetSelectedGizmo() == DCL.Components.DCLGizmos.Gizmo.NONE)
-            gizmoManager.SetGizmoType(BuilderInWorldSettings.TRANSLATE_GIZMO_NAME);
+            gizmoManager.SetGizmoType(BIWSettings.TRANSLATE_GIZMO_NAME);
         mouseCatcher.enabled = false;
         Environment.i.world.sceneController.IsolateScene(sceneToEdit);
         Utils.UnlockCursor();
@@ -531,7 +534,7 @@ public class BuilderInWorldGodMode : BuilderInWorldMode
     public override void OnDeleteEntity(DCLBuilderInWorldEntity entity)
     {
         base.OnDeleteEntity(entity);
-        biwSaveController.ForceSave();
+        biwSaveController.TryToSave();
 
         if (selectedEntities.Count == 0)
             gizmoManager.HideGizmo();
@@ -583,13 +586,7 @@ public class BuilderInWorldGodMode : BuilderInWorldMode
 
         gizmoManager.HideGizmo();
         if (createdEntity.isVoxel)
-        {
-            createdEntity.rootEntity.gameObject.tag = BuilderInWorldSettings.VOXEL_TAG;
-            voxelController.SetVoxelSelected(createdEntity);
-
-            // TODO: Voxels tools will be deactivated for Builder In World V1
-            //ActivateVoxelMode();
-        }
+            createdEntity.rootEntity.gameObject.tag = BIWSettings.VOXEL_TAG;
     }
 
     public override Vector3 GetCreatedEntityPoint() { return GetFloorPointAtMouse(Input.mousePosition); }
@@ -610,10 +607,6 @@ public class BuilderInWorldGodMode : BuilderInWorldMode
             TryLookAtEntity(selectedEntity.rootEntity);
 
         snapGO.transform.SetParent(null);
-        if (selectedEntity.isVoxel && selectedEntities.Count == 0)
-        {
-            editionGO.transform.position = voxelController.ConverPositionToVoxelPosition(editionGO.transform.position);
-        }
 
         UpdateActionsInteractable();
     }
@@ -630,7 +623,6 @@ public class BuilderInWorldGodMode : BuilderInWorldMode
         if (isPlacingNewObject)
             outlinerController.SetOutlineCheckActive(true);
         isPlacingNewObject = false;
-        DesactivateVoxelMode();
     }
 
     public override void EntityDoubleClick(DCLBuilderInWorldEntity entity)
@@ -650,7 +642,7 @@ public class BuilderInWorldGodMode : BuilderInWorldMode
     {
         if (isPlacingNewObject)
         {
-            builderInWorldEntityHandler.DestroyLastCreatedEntities();
+            biwEntityHandler.DestroyLastCreatedEntities();
             isPlacingNewObject = false;
             return true;
         }
@@ -713,11 +705,11 @@ public class BuilderInWorldGodMode : BuilderInWorldMode
 
     #region Gizmos
 
-    public void TranslateMode() { GizmosMode( BuilderInWorldSettings.TRANSLATE_GIZMO_NAME); }
+    public void TranslateMode() { GizmosMode( BIWSettings.TRANSLATE_GIZMO_NAME); }
 
-    public void RotateMode() { GizmosMode( BuilderInWorldSettings.ROTATE_GIZMO_NAME); }
+    public void RotateMode() { GizmosMode( BIWSettings.ROTATE_GIZMO_NAME); }
 
-    public void ScaleMode() { GizmosMode( BuilderInWorldSettings.SCALE_GIZMO_NAME); }
+    public void ScaleMode() { GizmosMode( BIWSettings.SCALE_GIZMO_NAME); }
 
     void GizmosMode(string gizmos)
     {
@@ -734,7 +726,7 @@ public class BuilderInWorldGodMode : BuilderInWorldMode
         // else
         // {
         //     gizmoManager.HideGizmo(true);
-        //     HUDController.i.builderInWorldMainHud?.SetGizmosActive(BuilderInWorldSettings.EMPTY_GIZMO_NAME);
+        //     HUDController.i.builderInWorldMainHud?.SetGizmosActive(BIWSettings.EMPTY_GIZMO_NAME);
         // }
     }
 
@@ -757,19 +749,19 @@ public class BuilderInWorldGodMode : BuilderInWorldMode
 
         switch (gizmoType)
         {
-            case BuilderInWorldSettings.TRANSLATE_GIZMO_NAME:
+            case BIWSettings.TRANSLATE_GIZMO_NAME:
 
                 ActionFinish(BuildInWorldCompleteAction.ActionType.MOVE);
                 break;
-            case BuilderInWorldSettings.ROTATE_GIZMO_NAME:
+            case BIWSettings.ROTATE_GIZMO_NAME:
                 ActionFinish(BuildInWorldCompleteAction.ActionType.ROTATE);
                 break;
-            case BuilderInWorldSettings.SCALE_GIZMO_NAME:
+            case BIWSettings.SCALE_GIZMO_NAME:
                 ActionFinish(BuildInWorldCompleteAction.ActionType.SCALE);
                 break;
         }
 
-        biwSaveController.ForceSave();
+        biwSaveController.TryToSave();
     }
 
     #endregion
@@ -797,7 +789,7 @@ public class BuilderInWorldGodMode : BuilderInWorldMode
         RaycastHit hit;
         UnityEngine.Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
-        if (Physics.Raycast(ray, out hit, RAYCAST_MAX_DISTANCE, groundLayer))
+        if (Physics.Raycast(ray, out hit, RAYCAST_MAX_DISTANCE, BIWSettings.GROUND_LAYER))
         {
             Vector3 destination = hit.point;
             if (isSnapActive)
@@ -818,7 +810,7 @@ public class BuilderInWorldGodMode : BuilderInWorldMode
         RaycastHit hit;
         UnityEngine.Ray ray = Camera.main.ScreenPointToRay(mousePosition);
 
-        if (Physics.Raycast(ray, out hit, RAYCAST_MAX_DISTANCE, groundLayer))
+        if (Physics.Raycast(ray, out hit, RAYCAST_MAX_DISTANCE, BIWSettings.GROUND_LAYER))
         {
             return hit.point;
         }
@@ -830,7 +822,7 @@ public class BuilderInWorldGodMode : BuilderInWorldMode
 
     private void TakeSceneScreenshotForPublish()
     {
-        builderInWorldEntityHandler.DeselectEntities();
+        biwEntityHandler.DeselectEntities();
 
         freeCameraController.TakeSceneScreenshot((sceneSnapshot) =>
         {
@@ -840,7 +832,7 @@ public class BuilderInWorldGodMode : BuilderInWorldMode
 
     public void TakeSceneScreenshotForExit()
     {
-        builderInWorldEntityHandler.DeselectEntities();
+        biwEntityHandler.DeselectEntities();
 
         freeCameraController.TakeSceneScreenshotFromResetPosition((sceneSnapshot) =>
         {
@@ -850,7 +842,7 @@ public class BuilderInWorldGodMode : BuilderInWorldMode
 
     public void OpenNewProjectDetails()
     {
-        builderInWorldEntityHandler.DeselectEntities();
+        biwEntityHandler.DeselectEntities();
 
         freeCameraController.TakeSceneScreenshot((sceneSnapshot) =>
         {

@@ -13,7 +13,7 @@ public class TutorialStep_PutSceneObject : TutorialStep
     public override void OnStepStart()
     {
         base.OnStepStart();
-        builderInWorldController = FindObjectOfType<BIWCreatorController>();
+        builderInWorldController = new BIWCreatorController();
         builderInWorldController.OnCatalogItemPlaced += SceneObjectSelected;
     }
 

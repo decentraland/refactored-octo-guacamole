@@ -22,6 +22,7 @@ public class BuilderInWorldBridge : MonoBehaviour
     //events and probably dont need to get called with that frecuency
     public event Action OnKernelUpdated;
     public event Action<bool, string> OnPublishEnd;
+    public event Action<string, string> OnBuilderProjectInfo;
     public event Action<string> OnCatalogHeadersReceived;
 
     //This is done for optimization purposes, recreating new objects can increase garbage collection
@@ -60,14 +61,14 @@ public class BuilderInWorldBridge : MonoBehaviour
     public void BuilderProjectInfo(string payload)
     {
         builderProjectPayload = JsonUtility.FromJson<BuilderProjectPayload>(payload);
-        HUDController.i.builderInWorldMainHud.SetBuilderProjectInfo(builderProjectPayload.title, builderProjectPayload.description);
+        OnBuilderProjectInfo?.Invoke(builderProjectPayload.title, builderProjectPayload.description);
     }
 
     #endregion
 
     #region MessagesToKernel
 
-    public void AskKernelForCatalogHeaders() { WebInterface.SendMessage(BuilderInWorldSettings.BIW_HEADER_REQUEST_EVENT_NAME); }
+    public void AskKernelForCatalogHeaders() { WebInterface.SendMessage(BIWSettings.BIW_HEADER_REQUEST_EVENT_NAME); }
 
     public void UpdateSmartItemComponent(DCLBuilderInWorldEntity entity, ParcelScene scene)
     {
@@ -89,13 +90,13 @@ public class BuilderInWorldBridge : MonoBehaviour
         saveProjectInfo.payload.description = sceneDescription;
         saveProjectInfo.payload.screenshot = sceneScreenshot;
 
-        WebInterface.SendSceneEvent(scene.sceneData.id, BuilderInWorldSettings.STATE_EVENT_NAME, saveProjectInfo);
+        WebInterface.SendSceneEvent(scene.sceneData.id, BIWSettings.STATE_EVENT_NAME, saveProjectInfo);
     }
 
     public void SaveSceneState(ParcelScene scene)
     {
         saveSceneState.payload = JsonUtility.ToJson(builderProjectPayload);
-        WebInterface.SendSceneEvent(scene.sceneData.id, BuilderInWorldSettings.STATE_EVENT_NAME, saveSceneState);
+        WebInterface.SendSceneEvent(scene.sceneData.id, BIWSettings.STATE_EVENT_NAME, saveSceneState);
     }
 
     public void ChangeEntityLockStatus(DCLBuilderInWorldEntity entity, ParcelScene scene)
@@ -136,7 +137,7 @@ public class BuilderInWorldBridge : MonoBehaviour
 
         WebInterface.SceneEvent<ModifyEntityComponentEvent> sceneEvent = new WebInterface.SceneEvent<ModifyEntityComponentEvent>();
         sceneEvent.sceneId = scene.sceneData.id;
-        sceneEvent.eventType = BuilderInWorldSettings.STATE_EVENT_NAME;
+        sceneEvent.eventType = BIWSettings.STATE_EVENT_NAME;
         sceneEvent.payload = modifyEntityComponentEvent;
 
 
@@ -146,7 +147,7 @@ public class BuilderInWorldBridge : MonoBehaviour
             ReferenceLoopHandling = ReferenceLoopHandling.Ignore
         });
 
-        WebInterface.BuilderInWorldMessage(BuilderInWorldSettings.SCENE_EVENT_NAME, message);
+        WebInterface.BuilderInWorldMessage(BIWSettings.SCENE_EVENT_NAME, message);
         OnKernelUpdated?.Invoke();
     }
 
@@ -221,12 +222,12 @@ public class BuilderInWorldBridge : MonoBehaviour
 
         WebInterface.SceneEvent<ModifyEntityComponentEvent> sceneEvent = new WebInterface.SceneEvent<ModifyEntityComponentEvent>();
         sceneEvent.sceneId = scene.sceneData.id;
-        sceneEvent.eventType = BuilderInWorldSettings.STATE_EVENT_NAME;
+        sceneEvent.eventType = BIWSettings.STATE_EVENT_NAME;
         sceneEvent.payload = modifyEntityComponentEvent;
 
         //Note (Adrian): We use Newtonsoft instead of JsonUtility because we need to deal with super classes, JsonUtility doesn't encode them
         string message = JsonConvert.SerializeObject(sceneEvent);
-        WebInterface.BuilderInWorldMessage(BuilderInWorldSettings.SCENE_EVENT_NAME, message);
+        WebInterface.BuilderInWorldMessage(BIWSettings.SCENE_EVENT_NAME, message);
     }
 
     public void RemoveEntityOnKernel(string entityId, ParcelScene scene)
@@ -236,7 +237,7 @@ public class BuilderInWorldBridge : MonoBehaviour
         removeEntityPayLoad.entityId = entityId;
         removeEntityEvent.payload = removeEntityPayLoad;
 
-        WebInterface.SendSceneEvent(scene.sceneData.id, BuilderInWorldSettings.STATE_EVENT_NAME, removeEntityEvent);
+        WebInterface.SendSceneEvent(scene.sceneData.id, BIWSettings.STATE_EVENT_NAME, removeEntityEvent);
         OnKernelUpdated?.Invoke();
     }
 
@@ -250,7 +251,7 @@ public class BuilderInWorldBridge : MonoBehaviour
         storeSceneState.payload.description = sceneDescription;
         storeSceneState.payload.screenshot = sceneScreenshot;
 
-        WebInterface.SendSceneEvent(scene.sceneData.id, BuilderInWorldSettings.STATE_EVENT_NAME, storeSceneState);
+        WebInterface.SendSceneEvent(scene.sceneData.id, BIWSettings.STATE_EVENT_NAME, storeSceneState);
     }
 
     // ReSharper disable Unity.PerformanceAnalysis
@@ -264,13 +265,13 @@ public class BuilderInWorldBridge : MonoBehaviour
 
         WebInterface.SceneEvent<AddEntityEvent> sceneEvent = new WebInterface.SceneEvent<AddEntityEvent>();
         sceneEvent.sceneId = sceneId;
-        sceneEvent.eventType = BuilderInWorldSettings.STATE_EVENT_NAME;
+        sceneEvent.eventType = BIWSettings.STATE_EVENT_NAME;
         sceneEvent.payload = addEntityEvent;
 
 
         //Note(Adrian): We use Newtonsoft instead of JsonUtility because we need to deal with super classes, JsonUtility doesn't encode them
         string message = JsonConvert.SerializeObject(sceneEvent);
-        WebInterface.BuilderInWorldMessage(BuilderInWorldSettings.SCENE_EVENT_NAME, message);
+        WebInterface.BuilderInWorldMessage(BIWSettings.SCENE_EVENT_NAME, message);
         OnKernelUpdated?.Invoke();
     }
 

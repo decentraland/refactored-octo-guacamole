@@ -13,8 +13,8 @@ public class BIWGizmosShould : IntegrationTestSuite_Legacy
     protected override IEnumerator SetUp()
     {
         yield return base.SetUp();
-        BuilderInWorldController controller = Resources.FindObjectsOfTypeAll<BuilderInWorldController>()[0];
-        gizmosController = controller.biwModeController.editorMode.gizmoManager;
+        var referencesController = BIWTestHelper.CreateMockUpReferenceController();
+        gizmosController = referencesController.projectReferences.godModeBuilderPrefab.GetComponentInChildren<DCLBuilderGizmoManager>();
     }
 
     [Test]
@@ -31,37 +31,37 @@ public class BIWGizmosShould : IntegrationTestSuite_Legacy
     public void TestActivationTranslateGizmos()
     {
         //Act
-        gizmosController.SetGizmoType(BuilderInWorldSettings.TRANSLATE_GIZMO_NAME);
+        gizmosController.SetGizmoType(BIWSettings.TRANSLATE_GIZMO_NAME);
 
         //Assert
-        Assert.AreEqual(gizmosController.GetSelectedGizmo(), BuilderInWorldSettings.TRANSLATE_GIZMO_NAME);
+        Assert.AreEqual(gizmosController.GetSelectedGizmo(), BIWSettings.TRANSLATE_GIZMO_NAME);
     }
 
     [Test]
     public void TestActivationRotateGizmos()
     {
         //Act
-        gizmosController.SetGizmoType(BuilderInWorldSettings.ROTATE_GIZMO_NAME);
+        gizmosController.SetGizmoType(BIWSettings.ROTATE_GIZMO_NAME);
 
         //Assert
-        Assert.AreEqual(gizmosController.GetSelectedGizmo(), BuilderInWorldSettings.ROTATE_GIZMO_NAME);
+        Assert.AreEqual(gizmosController.GetSelectedGizmo(), BIWSettings.ROTATE_GIZMO_NAME);
     }
 
     [Test]
     public void TestActivationScaleGizmos()
     {
         //Act
-        gizmosController.SetGizmoType(BuilderInWorldSettings.SCALE_GIZMO_NAME);
+        gizmosController.SetGizmoType(BIWSettings.SCALE_GIZMO_NAME);
 
         //Assert
-        Assert.AreEqual(gizmosController.GetSelectedGizmo(), BuilderInWorldSettings.SCALE_GIZMO_NAME);
+        Assert.AreEqual(gizmosController.GetSelectedGizmo(), BIWSettings.SCALE_GIZMO_NAME);
     }
 
     [Test]
     public void TestTranslateGizmosType()
     {
         //Arrange
-        gizmosController.SetGizmoType(BuilderInWorldSettings.TRANSLATE_GIZMO_NAME);
+        gizmosController.SetGizmoType(BIWSettings.TRANSLATE_GIZMO_NAME);
         DCLBuilderGizmo translateGizmo = gizmosController.activeGizmo;
 
         //Assert
@@ -72,7 +72,7 @@ public class BIWGizmosShould : IntegrationTestSuite_Legacy
     public void TestRotateGizmosType()
     {
         //Arrange
-        gizmosController.SetGizmoType(BuilderInWorldSettings.ROTATE_GIZMO_NAME);
+        gizmosController.SetGizmoType(BIWSettings.ROTATE_GIZMO_NAME);
         DCLBuilderGizmo gizmo = gizmosController.activeGizmo;
 
         //Assert
@@ -83,7 +83,7 @@ public class BIWGizmosShould : IntegrationTestSuite_Legacy
     public void TestScaleGizmosType()
     {
         //Arrange
-        gizmosController.SetGizmoType(BuilderInWorldSettings.SCALE_GIZMO_NAME);
+        gizmosController.SetGizmoType(BIWSettings.SCALE_GIZMO_NAME);
         DCLBuilderGizmo gizmo = gizmosController.activeGizmo;
 
         //Assert

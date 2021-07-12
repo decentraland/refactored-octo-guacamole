@@ -56,7 +56,7 @@ public class BIWSearchBarShould : MonoBehaviour
     {
         // Arrange
         string nameToFilter = "dirt";
-        BuilderInWorldTestHelper.CreateTestCatalogLocalSingleObject();
+        BIWTestHelper.CreateTestCatalogLocalSingleObject();
 
         // Act
         biwSearchBarController.FilterAssets(nameToFilter);
@@ -70,7 +70,7 @@ public class BIWSearchBarShould : MonoBehaviour
     {
         // Arrange
         string nameToFilter = "sand";
-        BuilderInWorldTestHelper.CreateTestCatalogLocalSingleObject();
+        BIWTestHelper.CreateTestCatalogLocalSingleObject();
 
         // Act
         biwSearchBarController.FilterAssets(nameToFilter);
@@ -84,7 +84,7 @@ public class BIWSearchBarShould : MonoBehaviour
     {
         // Arrange
         string nameToFilter = "decorations";
-        BuilderInWorldTestHelper.CreateTestCatalogLocalSingleObject();
+        BIWTestHelper.CreateTestCatalogLocalSingleObject();
 
         // Act
         biwSearchBarController.FilterAssets(nameToFilter);
@@ -98,7 +98,7 @@ public class BIWSearchBarShould : MonoBehaviour
     {
         // Arrange
         string nameToFilter = "structure";
-        BuilderInWorldTestHelper.CreateTestCatalogLocalSingleObject();
+        BIWTestHelper.CreateTestCatalogLocalSingleObject();
 
         // Act
         biwSearchBarController.FilterAssets(nameToFilter);
@@ -112,7 +112,7 @@ public class BIWSearchBarShould : MonoBehaviour
     {
         // Arrange
         string nameToFilter = "fantasy";
-        BuilderInWorldTestHelper.CreateTestCatalogLocalSingleObject();
+        BIWTestHelper.CreateTestCatalogLocalSingleObject();
 
         // Act
         biwSearchBarController.FilterAssets(nameToFilter);
@@ -126,7 +126,7 @@ public class BIWSearchBarShould : MonoBehaviour
     {
         // Arrange
         string nameToFilter = "wood";
-        BuilderInWorldTestHelper.CreateTestCatalogLocalSingleObject();
+        BIWTestHelper.CreateTestCatalogLocalSingleObject();
 
         // Act
         biwSearchBarController.FilterAssets(nameToFilter);
@@ -139,7 +139,7 @@ public class BIWSearchBarShould : MonoBehaviour
     public void FilterBySmartItem()
     {
         // Arrange
-        BuilderInWorldTestHelper.CreateTestSmartItemCatalogLocalSingleObject();
+        BIWTestHelper.CreateTestSmartItemCatalogLocalSingleObject();
 
         // Act
         biwSearchBarController.ChangeSmartItemFilter();
@@ -153,7 +153,7 @@ public class BIWSearchBarShould : MonoBehaviour
     public void FilterBySmartItemNoResult()
     {
         // Arrange
-        BuilderInWorldTestHelper.CreateTestCatalogLocalSingleObject();
+        BIWTestHelper.CreateTestCatalogLocalSingleObject();
 
         // Act
         biwSearchBarController.ChangeSmartItemFilter();

@@ -119,12 +119,12 @@ namespace DCL.Camera
 
         private void Awake()
         {
-            BuilderInWorldInputWrapper.OnMouseDrag += MouseDrag;
-            BuilderInWorldInputWrapper.OnMouseDragRaw += MouseDragRaw;
-            BuilderInWorldInputWrapper.OnMouseWheel += MouseWheel;
+            BIWInputWrapper.OnMouseDrag += MouseDrag;
+            BIWInputWrapper.OnMouseDragRaw += MouseDragRaw;
+            BIWInputWrapper.OnMouseWheel += MouseWheel;
 
-            BuilderInWorldInputWrapper.OnMouseDown += OnInputMouseDown;
-            BuilderInWorldInputWrapper.OnMouseUp += OnInputMouseUp;
+            BIWInputWrapper.OnMouseDown += OnInputMouseDown;
+            BIWInputWrapper.OnMouseUp += OnInputMouseUp;
 
             DCLBuilderGizmoManager.OnGizmoTransformObjectStart += OnGizmoTransformObjectStart;
             DCLBuilderGizmoManager.OnGizmoTransformObjectEnd += OnGizmoTransformObjectEnd;
@@ -207,12 +207,12 @@ namespace DCL.Camera
 
         private void OnDestroy()
         {
-            BuilderInWorldInputWrapper.OnMouseDrag -= MouseDrag;
-            BuilderInWorldInputWrapper.OnMouseDragRaw -= MouseDragRaw;
-            BuilderInWorldInputWrapper.OnMouseWheel -= MouseWheel;
+            BIWInputWrapper.OnMouseDrag -= MouseDrag;
+            BIWInputWrapper.OnMouseDragRaw -= MouseDragRaw;
+            BIWInputWrapper.OnMouseWheel -= MouseWheel;
 
-            BuilderInWorldInputWrapper.OnMouseDown -= OnInputMouseDown;
-            BuilderInWorldInputWrapper.OnMouseUp -= OnInputMouseUp;
+            BIWInputWrapper.OnMouseDown -= OnInputMouseDown;
+            BIWInputWrapper.OnMouseUp -= OnInputMouseUp;
 
             advanceFowardInputAction.OnStarted -= advanceForwardStartDelegate;
             advanceFowardInputAction.OnFinished -= advanceForwardFinishedDelegate;

@@ -260,6 +260,8 @@ namespace Builder.Gizmos
 
         private void CheckGizmoHover(Vector3 mousePosition)
         {
+            if (builderRaycast.builderCamera == null)
+                return;
             RaycastHit hit;
             if (builderRaycast.RaycastToGizmos(mousePosition, out hit))
             {

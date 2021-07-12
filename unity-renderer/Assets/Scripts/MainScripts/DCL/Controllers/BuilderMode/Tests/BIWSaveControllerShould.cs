@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using DCL;
 using NUnit.Framework;
 using UnityEngine;
 
@@ -15,11 +16,9 @@ public class BIWSaveControllerShould : IntegrationTestSuite_Legacy
         yield return base.SetUp();
         gameObject = new GameObject();
 
-        biwSaveController = gameObject.AddComponent<BIWSaveController>();
-        builderInWorldBridge = gameObject.AddComponent<BuilderInWorldBridge>();
-
-        biwSaveController.builderInWorldBridge = builderInWorldBridge;
-        biwSaveController.Init();
+        builderInWorldBridge = InitialSceneReferences.i.builderInWorldBridge;
+        biwSaveController = new BIWSaveController();
+        biwSaveController.Init(BIWTestHelper.CreateMockUpReferenceController());
         biwSaveController.EnterEditMode(scene);
     }
 
@@ -58,7 +57,8 @@ public class BIWSaveControllerShould : IntegrationTestSuite_Legacy
 
     protected override IEnumerator TearDown()
     {
-        Object.Destroy(gameObject);
+        if (gameObject != null)
+            Object.Destroy(gameObject);
         yield return base.TearDown();
     }
 }

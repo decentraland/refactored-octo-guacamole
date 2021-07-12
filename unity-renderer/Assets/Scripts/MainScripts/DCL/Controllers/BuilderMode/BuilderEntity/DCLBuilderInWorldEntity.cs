@@ -140,11 +140,11 @@ public class DCLBuilderInWorldEntity : EditableEntity
 
     public bool HasShape() { return isShapeComponentSet; }
 
-    public bool HasMovedSinceLastReport() { return Vector3.Distance(lastPositionReported, transform.position) >= BuilderInWorldSettings.ENTITY_POSITION_REPORTING_THRESHOLD; }
+    public bool HasMovedSinceLastReport() { return Vector3.Distance(lastPositionReported, transform.position) >= BIWSettings.ENTITY_POSITION_REPORTING_THRESHOLD; }
 
-    public bool HasScaledSinceLastReport() { return Math.Abs(lastScaleReported.magnitude - transform.lossyScale.magnitude) >= BuilderInWorldSettings.ENTITY_SCALE_REPORTING_THRESHOLD; }
+    public bool HasScaledSinceLastReport() { return Math.Abs(lastScaleReported.magnitude - transform.lossyScale.magnitude) >= BIWSettings.ENTITY_SCALE_REPORTING_THRESHOLD; }
 
-    public bool HasRotatedSinceLastReport() { return Quaternion.Angle(lastRotationReported, transform.rotation) >= BuilderInWorldSettings.ENTITY_ROTATION_REPORTING_THRESHOLD; }
+    public bool HasRotatedSinceLastReport() { return Quaternion.Angle(lastRotationReported, transform.rotation) >= BIWSettings.ENTITY_ROTATION_REPORTING_THRESHOLD; }
 
     public void PositionReported() { lastPositionReported = transform.position; }
 
@@ -488,7 +488,7 @@ public class DCLBuilderInWorldEntity : EditableEntity
     void SetEntityAsVoxel()
     {
         isVoxel = true;
-        gameObject.tag = BuilderInWorldSettings.VOXEL_TAG;
+        gameObject.tag = BIWSettings.VOXEL_TAG;
     }
 
     void SaveOriginalMaterial()
@@ -604,7 +604,7 @@ public class DCLBuilderInWorldEntity : EditableEntity
         Transform[] children = GetComponentsInChildren<Transform>();
         foreach (Transform child in children)
         {
-            if (child.gameObject.layer ==  BuilderInWorldSettings.COLLIDER_SELECTION_LAYER)
+            if (child.gameObject.layer ==  BIWSettings.COLLIDER_SELECTION_LAYER)
             {
                 Destroy(child.gameObject);
             }
@@ -617,7 +617,7 @@ public class DCLBuilderInWorldEntity : EditableEntity
             if (meshInfo.renderers[i] == null)
                 continue;
             GameObject entityColliderChildren = new GameObject(entity.entityId);
-            entityColliderChildren.layer = BuilderInWorldSettings.COLLIDER_SELECTION_LAYER;
+            entityColliderChildren.layer = BIWSettings.COLLIDER_SELECTION_LAYER;
 
             Transform t = entityColliderChildren.transform;
             t.SetParent(meshInfo.renderers[i].transform);
@@ -667,7 +667,7 @@ public class DCLBuilderInWorldEntity : EditableEntity
         return false;
     }
 
-    bool IsEntityAFloor() { return GetCatalogItemAssociated()?.category == BuilderInWorldSettings.FLOOR_CATEGORY; }
+    bool IsEntityAFloor() { return GetCatalogItemAssociated()?.category == BIWSettings.FLOOR_CATEGORY; }
 
     bool IsEntityAVoxel()
     {

@@ -126,16 +126,16 @@ public static partial class BuilderInWorldUtils
     public static CatalogItem CreateFloorSceneObject()
     {
         CatalogItem floorSceneObject = new CatalogItem();
-        floorSceneObject.id = BuilderInWorldSettings.FLOOR_ID;
+        floorSceneObject.id = BIWSettings.FLOOR_ID;
 
-        floorSceneObject.model = BuilderInWorldSettings.FLOOR_MODEL;
-        floorSceneObject.name = BuilderInWorldSettings.FLOOR_NAME;
-        floorSceneObject.assetPackName = BuilderInWorldSettings.FLOOR_ASSET_PACK_NAME;
+        floorSceneObject.model = BIWSettings.FLOOR_MODEL;
+        floorSceneObject.name = BIWSettings.FLOOR_NAME;
+        floorSceneObject.assetPackName = BIWSettings.FLOOR_ASSET_PACK_NAME;
 
         floorSceneObject.contents = new Dictionary<string, string>();
 
-        floorSceneObject.contents.Add(BuilderInWorldSettings.FLOOR_GLTF_KEY, BuilderInWorldSettings.FLOOR_GLTF_VALUE);
-        floorSceneObject.contents.Add(BuilderInWorldSettings.FLOOR_TEXTURE_KEY, BuilderInWorldSettings.FLOOR_TEXTURE_VALUE);
+        floorSceneObject.contents.Add(BIWSettings.FLOOR_GLTF_KEY, BIWSettings.FLOOR_GLTF_VALUE);
+        floorSceneObject.contents.Add(BIWSettings.FLOOR_TEXTURE_KEY, BIWSettings.FLOOR_TEXTURE_VALUE);
 
         floorSceneObject.metrics = new SceneObject.ObjectMetrics();
 

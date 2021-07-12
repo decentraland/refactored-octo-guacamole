@@ -7,29 +7,29 @@ using UnityEngine.UI;
 public interface ITopActionsButtonsView
 {
     event Action OnChangeModeClicked,
-        OnExtraClicked,
-        OnTranslateClicked,
-        OnRotateClicked,
-        OnScaleClicked,
-        OnUndoClicked,
-        OnRedoClicked,
-        OnDuplicateClicked,
-        OnDeleteClicked,
-        OnLogOutClicked,
-        OnSnapModeClicked,
-        OnPointerExit;
+                 OnExtraClicked,
+                 OnTranslateClicked,
+                 OnRotateClicked,
+                 OnScaleClicked,
+                 OnUndoClicked,
+                 OnRedoClicked,
+                 OnDuplicateClicked,
+                 OnDeleteClicked,
+                 OnLogOutClicked,
+                 OnSnapModeClicked,
+                 OnPointerExit;
 
     event Action<BaseEventData, string> OnChangeCameraModePointerEnter,
-        OnTranslatePointerEnter,
-        OnRotatePointerEnter,
-        OnScalePointerEnter,
-        OnUndoPointerEnter,
-        OnRedoPointerEnter,
-        OnDuplicatePointerEnter,
-        OnDeletePointerEnter,
-        OnMoreActionsPointerEnter,
-        OnLogoutPointerEnter,
-        OnSnapModePointerEnter;
+                                        OnTranslatePointerEnter,
+                                        OnRotatePointerEnter,
+                                        OnScalePointerEnter,
+                                        OnUndoPointerEnter,
+                                        OnRedoPointerEnter,
+                                        OnDuplicatePointerEnter,
+                                        OnDeletePointerEnter,
+                                        OnMoreActionsPointerEnter,
+                                        OnLogoutPointerEnter,
+                                        OnSnapModePointerEnter;
 
     void ConfigureExtraActions(IExtraActionsController extraActionsController);
     void OnChangeModeClick(DCLAction_Trigger action);
@@ -50,29 +50,29 @@ public interface ITopActionsButtonsView
 public class TopActionsButtonsView : MonoBehaviour, ITopActionsButtonsView
 {
     public event Action OnChangeModeClicked,
-        OnExtraClicked,
-        OnTranslateClicked,
-        OnRotateClicked,
-        OnScaleClicked,
-        OnUndoClicked,
-        OnRedoClicked,
-        OnDuplicateClicked,
-        OnDeleteClicked,
-        OnLogOutClicked,
-        OnSnapModeClicked,
-        OnPointerExit;
+                        OnExtraClicked,
+                        OnTranslateClicked,
+                        OnRotateClicked,
+                        OnScaleClicked,
+                        OnUndoClicked,
+                        OnRedoClicked,
+                        OnDuplicateClicked,
+                        OnDeleteClicked,
+                        OnLogOutClicked,
+                        OnSnapModeClicked,
+                        OnPointerExit;
 
     public event Action<BaseEventData, string> OnChangeCameraModePointerEnter,
-        OnTranslatePointerEnter,
-        OnRotatePointerEnter,
-        OnScalePointerEnter,
-        OnUndoPointerEnter,
-        OnRedoPointerEnter,
-        OnDuplicatePointerEnter,
-        OnDeletePointerEnter,
-        OnMoreActionsPointerEnter,
-        OnLogoutPointerEnter,
-        OnSnapModePointerEnter;
+                                               OnTranslatePointerEnter,
+                                               OnRotatePointerEnter,
+                                               OnScalePointerEnter,
+                                               OnUndoPointerEnter,
+                                               OnRedoPointerEnter,
+                                               OnDuplicatePointerEnter,
+                                               OnDeletePointerEnter,
+                                               OnMoreActionsPointerEnter,
+                                               OnLogoutPointerEnter,
+                                               OnSnapModePointerEnter;
 
     [Header("Buttons")]
     [SerializeField] internal Button changeModeBtn;
@@ -357,13 +357,13 @@ public class TopActionsButtonsView : MonoBehaviour, ITopActionsButtonsView
 
         switch (gizmos)
         {
-            case BuilderInWorldSettings.TRANSLATE_GIZMO_NAME:
+            case BIWSettings.TRANSLATE_GIZMO_NAME:
                 translateGizmosBtnImg.color = selectedBtnImgColor;
                 break;
-            case BuilderInWorldSettings.ROTATE_GIZMO_NAME:
+            case BIWSettings.ROTATE_GIZMO_NAME:
                 rotateGizmosBtnImg.color = selectedBtnImgColor;
                 break;
-            case BuilderInWorldSettings.SCALE_GIZMO_NAME:
+            case BIWSettings.SCALE_GIZMO_NAME:
                 scaleGizmosBtnImg.color = selectedBtnImgColor;
                 break;
         }

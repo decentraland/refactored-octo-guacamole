@@ -10,14 +10,13 @@ public class BIWEntityHandlerShould : IntegrationTestSuite_Legacy
 {
     private const string ENTITY_ID = "1";
     DCLBuilderInWorldEntity entity;
-    BuilderInWorldEntityHandler entityHandler;
+    BIWEntityHandler entityHandler;
 
     protected override IEnumerator SetUp()
     {
         yield return base.SetUp();
-        BuilderInWorldController controller = Resources.FindObjectsOfTypeAll<BuilderInWorldController>()[0];
-        entityHandler = controller.builderInWorldEntityHandler;
-        entityHandler.Init();
+        entityHandler = new BIWEntityHandler();
+        entityHandler.Init(BIWTestHelper.CreateMockUpReferenceController());
 
         TestHelpers.CreateSceneEntity(scene, ENTITY_ID);
         entityHandler.EnterEditMode(scene);
@@ -87,5 +86,12 @@ public class BIWEntityHandlerShould : IntegrationTestSuite_Legacy
         DCLBuilderInWorldEntity convertedEntity = entityHandler.GetConvertedEntity(duplicateEntity);
 
         Assert.IsNotNull(convertedEntity);
+    }
+
+    protected override IEnumerator TearDown()
+    {
+        entityHandler.Dispose();
+
+        yield return base.TearDown();
     }
 }

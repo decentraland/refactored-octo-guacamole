@@ -204,7 +204,7 @@ namespace Tests.BuildModeHUDControllers
         public void TestSetGizmosActivetedCorrectly()
         {
             //Arrange
-            string gizmosActive =  BuilderInWorldSettings.TRANSLATE_GIZMO_NAME;
+            string gizmosActive =  BIWSettings.TRANSLATE_GIZMO_NAME;
 
             // Act
             topActionsButtonsController.SetGizmosActive(gizmosActive);

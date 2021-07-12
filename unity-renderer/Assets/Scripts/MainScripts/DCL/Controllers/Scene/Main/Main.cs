@@ -16,11 +16,14 @@ namespace DCL
         public static Main i { get; private set; }
 
         public PoolableComponentFactory componentFactory;
+        public GameObject builderInWorldPrefab;
 
         public DebugConfig debugConfig;
 
         private PerformanceMetricsController performanceMetricsController;
         private EntryPoint_World worldEntryPoint;
+
+        private FeatureController featureController;
 
         void Awake()
         {
@@ -42,6 +45,8 @@ namespace DCL
                 performanceMetricsController = new PerformanceMetricsController();
                 RenderProfileManifest.i.Initialize();
                 SetupEnvironment();
+                featureController = new FeatureController();
+                featureController.SetBuilderInWorldPrefab(builderInWorldPrefab);
             }
 
             DCL.Interface.WebInterface.SendSystemInfoReport();
@@ -65,31 +70,24 @@ namespace DCL
                 messagingBuilder: MessagingContextBuilder,
                 platformBuilder: PlatformContextBuilder,
                 worldRuntimeBuilder: WorldRuntimeContextBuilder,
-                hudBuilder: HUDContextBuilder);    
+                hudBuilder: HUDContextBuilder);
         }
-        protected virtual MessagingContext MessagingContextBuilder()
+        protected virtual MessagingContext MessagingContextBuilder() { return MessagingContextFactory.CreateDefault(); }
+        protected virtual PlatformContext PlatformContextBuilder() { return PlatformContextFactory.CreateDefault(); }
+        protected virtual WorldRuntimeContext WorldRuntimeContextBuilder() { return WorldRuntimeContextFactory.CreateDefault(componentFactory); }
+        protected virtual HUDContext HUDContextBuilder() { return HUDContextFactory.CreateDefault(); }
+        private void Start()
         {
-            return MessagingContextFactory.CreateDefault();
+            Environment.i.world.sceneController.Start();
+            featureController?.Start();
         }
-        protected virtual PlatformContext PlatformContextBuilder()
-        {
-            return PlatformContextFactory.CreateDefault();
-        }
-        protected virtual WorldRuntimeContext WorldRuntimeContextBuilder()
-        {
-            return WorldRuntimeContextFactory.CreateDefault(componentFactory);
-        }
-        protected virtual HUDContext HUDContextBuilder()
-        {
-            return HUDContextFactory.CreateDefault();
-        }
-        private void Start() { Environment.i.world.sceneController.Start(); }
 
         private void Update()
         {
             Environment.i.platform.idleChecker.Update();
             Environment.i.world.sceneController.Update();
             performanceMetricsController?.Update();
+            featureController?.Update();
         }
 
         private void LateUpdate() { Environment.i.world.sceneController.LateUpdate(); }
@@ -98,6 +96,7 @@ namespace DCL
         {
             if (!Configuration.EnvironmentSettings.RUNNING_TESTS)
                 Environment.Dispose();
+            featureController?.OnDestroy();
         }
 
         #region RuntimeMessagingBridge

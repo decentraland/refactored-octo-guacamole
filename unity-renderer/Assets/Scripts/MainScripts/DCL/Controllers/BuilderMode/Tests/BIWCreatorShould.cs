@@ -11,19 +11,22 @@ using UnityEngine.TestTools;
 
 public class BIWCreatorShould : IntegrationTestSuite_Legacy
 {
-    private BuilderInWorldEntityHandler entityHandler;
-    private BuilderInWorldController controller;
+    private BIWEntityHandler entityHandler;
     private BIWCreatorController biwCreatorController;
 
     protected override IEnumerator SetUp()
     {
         yield return base.SetUp();
-        controller = Resources.FindObjectsOfTypeAll<BuilderInWorldController>()[0];
 
-        biwCreatorController = controller.biwCreatorController;
-        biwCreatorController.Init();
-        entityHandler = controller.builderInWorldEntityHandler;
-        entityHandler.Init();
+        biwCreatorController = new BIWCreatorController();
+        entityHandler = new BIWEntityHandler();
+        var referencesController = BIWTestHelper.CreateReferencesControllerWithGenericMocks(
+            entityHandler,
+            biwCreatorController
+        );
+
+        biwCreatorController.Init(referencesController);
+        entityHandler.Init(referencesController);
 
         entityHandler.EnterEditMode(scene);
         biwCreatorController.EnterEditMode(scene);
@@ -34,7 +37,7 @@ public class BIWCreatorShould : IntegrationTestSuite_Legacy
     {
         //Arrange
         BIWCatalogManager.Init();
-        BuilderInWorldTestHelper.CreateTestCatalogLocalSingleObject();
+        BIWTestHelper.CreateTestCatalogLocalSingleObject();
         CatalogItem item = DataStore.i.builderInWorld.catalogItemDict.GetValues()[0];
 
         //Act
@@ -53,7 +56,7 @@ public class BIWCreatorShould : IntegrationTestSuite_Legacy
     {
         //Arrange
         BIWCatalogManager.Init();
-        BuilderInWorldTestHelper.CreateTestCatalogLocalSingleObject();
+        BIWTestHelper.CreateTestCatalogLocalSingleObject();
         CatalogItem item = DataStore.i.builderInWorld.catalogItemDict.GetValues()[0];
 
         //Act
@@ -75,7 +78,7 @@ public class BIWCreatorShould : IntegrationTestSuite_Legacy
     {
         //Arrange
         BIWCatalogManager.Init();
-        BuilderInWorldTestHelper.CreateTestCatalogLocalSingleObject();
+        BIWTestHelper.CreateTestCatalogLocalSingleObject();
         CatalogItem item = DataStore.i.builderInWorld.catalogItemDict.GetValues()[0];
 
         //Act
@@ -91,7 +94,7 @@ public class BIWCreatorShould : IntegrationTestSuite_Legacy
     {
         //Arrange
         BIWCatalogManager.Init();
-        BuilderInWorldTestHelper.CreateTestCatalogLocalSingleObject();
+        BIWTestHelper.CreateTestCatalogLocalSingleObject();
         CatalogItem item = DataStore.i.builderInWorld.catalogItemDict.GetValues()[0];
 
         //Act
@@ -108,7 +111,7 @@ public class BIWCreatorShould : IntegrationTestSuite_Legacy
     {
         //Arrange
         BIWCatalogManager.Init();
-        BuilderInWorldTestHelper.CreateTestCatalogLocalSingleObject();
+        BIWTestHelper.CreateTestCatalogLocalSingleObject();
         CatalogItem item = DataStore.i.builderInWorld.catalogItemDict.GetValues()[0];
         biwCreatorController.CreateCatalogItem(item);
         DCLBuilderInWorldEntity entity = entityHandler.GetAllEntitiesFromCurrentScene().FirstOrDefault();
@@ -125,7 +128,7 @@ public class BIWCreatorShould : IntegrationTestSuite_Legacy
     {
         //Arrange
         BIWCatalogManager.Init();
-        BuilderInWorldTestHelper.CreateTestCatalogLocalSingleObject();
+        BIWTestHelper.CreateTestCatalogLocalSingleObject();
         CatalogItem item = DataStore.i.builderInWorld.catalogItemDict.GetValues()[0];
         biwCreatorController.CreateCatalogItem(item);
         DCLBuilderInWorldEntity entity = entityHandler.GetAllEntitiesFromCurrentScene().FirstOrDefault();
@@ -143,7 +146,7 @@ public class BIWCreatorShould : IntegrationTestSuite_Legacy
     {
         //Arrange
         BIWCatalogManager.Init();
-        BuilderInWorldTestHelper.CreateTestCatalogLocalSingleObject();
+        BIWTestHelper.CreateTestCatalogLocalSingleObject();
         CatalogItem item = DataStore.i.builderInWorld.catalogItemDict.GetValues()[0];
 
         //Act
@@ -173,7 +176,6 @@ public class BIWCreatorShould : IntegrationTestSuite_Legacy
     {
         BIWCatalogManager.ClearCatalog();
         BuilderInWorldNFTController.i.ClearNFTs();
-        controller.CleanItems();
         foreach (var placeHolder in GameObject.FindObjectsOfType<BIWLoadingPlaceHolder>())
         {
             placeHolder.Dispose();

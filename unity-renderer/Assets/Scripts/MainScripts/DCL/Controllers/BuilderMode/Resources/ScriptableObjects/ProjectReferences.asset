@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0f4646969e6a20d4aaf0fc84cdb00fb1, type: 3}
+  m_Name: ProjectReferences
+  m_EditorClassIdentifier: 
+  skyBoxMaterial: {fileID: 2100000, guid: 899091b108419404aad5edee33f5a383, type: 2}
+  editMaterial: {fileID: 2100000, guid: 92b0ce4a86423dd48b66212090fc7e34, type: 2}
+  cameraOutlinerMaterial: {fileID: 2100000, guid: 2bf8916261b5ffc46b4ba519ff75ede4,
+    type: 2}
+  errorPrefab: {fileID: 4033134647701233386, guid: 3fab1b532c173cb42b63910043234fe1,
+    type: 3}
+  floorPlaceHolderPrefab: {fileID: 3848538323447533592, guid: ea1dee13f58202f409bb86c92a202112,
+    type: 3}
+  floorLoadingPrefab: {fileID: 5950472912581580848, guid: 4b06f4730ab123b40ab632c252c2fc2f,
+    type: 3}
+  loadingPrefab: {fileID: 9065723555097372216, guid: d21a9c099a778423a908066cf9f458a0,
+    type: 3}
+  godModeBuilderPrefab: {fileID: 8249807546955247409, guid: b27d38856c5f37c498d7ad7c2f767f0b,
+    type: 3}
+  audioPrefab: {fileID: 5263035319998155755, guid: 0d9a89d47f96fbe47930f8c6b1e14fd0,
+    type: 3}

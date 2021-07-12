@@ -46,7 +46,9 @@ namespace Builder
             DCLBuilderBridge.OnPreviewModeChanged += OnPreviewModeChanged;
         }
 
-        private void OnDestroy()
+        private void OnDestroy() { Dispose(); }
+
+        public void Dispose()
         {
             if (outlineCanvas != null)
                 Destroy(outlineCanvas.gameObject);

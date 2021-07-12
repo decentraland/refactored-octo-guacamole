@@ -11,14 +11,13 @@ public class BIWEntityShould : IntegrationTestSuite_Legacy
 {
     private const string ENTITY_ID = "1";
     DCLBuilderInWorldEntity entity;
-    BuilderInWorldEntityHandler entityHandler;
+    BIWEntityHandler entityHandler;
 
     protected override IEnumerator SetUp()
     {
         yield return base.SetUp();
-        BuilderInWorldController controller = Resources.FindObjectsOfTypeAll<BuilderInWorldController>()[0];
-        entityHandler = controller.builderInWorldEntityHandler;
-        entityHandler.Init();
+        entityHandler = new BIWEntityHandler();
+        entityHandler.Init(BIWTestHelper.CreateMockUpReferenceController());
 
         TestHelpers.CreateSceneEntity(scene, ENTITY_ID);
         entityHandler.EnterEditMode(scene);

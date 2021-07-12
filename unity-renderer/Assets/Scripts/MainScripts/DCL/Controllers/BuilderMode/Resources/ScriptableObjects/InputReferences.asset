@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1de08f3fb0b440242be552c9e23b2179, type: 3}
+  m_Name: InputReferences
+  m_EditorClassIdentifier: 
+  hideSelectedEntitiesAction: {fileID: 11400000, guid: a9f9f5fb4f1639d4b8461c2838cfae56,
+    type: 2}
+  showAllEntitiesAction: {fileID: 11400000, guid: f0a0f94cc4fd01c4e82210e0de670a65,
+    type: 2}
+  toggleSnapModeInputAction: {fileID: 11400000, guid: 9069f92e06a1094478a137f5274d1ab6,
+    type: 2}
+  editModeChangeInputAction: {fileID: 11400000, guid: 4f763868020343f469cebb00aaf01960,
+    type: 2}
+  toggleRedoActionInputAction: {fileID: 11400000, guid: 04b9b1db1e772b84ba73426304948e60,
+    type: 2}
+  toggleUndoActionInputAction: {fileID: 11400000, guid: 4cee9aa16106c7d44900a13123280dac,
+    type: 2}
+  multiSelectionInputAction: {fileID: 11400000, guid: 5c1dc0623e14bc3439b6f58922b177ba,
+    type: 2}
+  firstPersonRotationHold: {fileID: 11400000, guid: 3aea5eddf3f7c8a4988b3e4d951ca84a,
+    type: 2}
+  focusOnSelectedEntitiesInputAction: {fileID: 11400000, guid: 746094ad79f2853439fc98abd3963fb8,
+    type: 2}
