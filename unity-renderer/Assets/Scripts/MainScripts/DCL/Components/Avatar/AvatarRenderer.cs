@@ -374,6 +374,13 @@ namespace DCL
             else
             {
                 OnSuccessEvent?.Invoke();
+
+                var rends = GetComponentsInChildren<SkinnedMeshRenderer>();
+
+                foreach ( var r in rends )
+                {
+                    r.quality = SkinQuality.Bone1;
+                }
             }
         }
 
