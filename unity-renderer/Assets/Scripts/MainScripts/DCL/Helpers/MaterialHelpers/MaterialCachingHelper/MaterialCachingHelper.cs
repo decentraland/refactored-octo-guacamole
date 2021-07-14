@@ -38,6 +38,54 @@ namespace DCL.Helpers
             return mainShader;
         }
 
+        public static Material ProcessSingleMaterial(Material mat, Mode cachingFlags = Mode.CACHE_EVERYTHING)
+        {
+            if ((cachingFlags & Mode.CACHE_SHADERS) != 0)
+            {
+                string shaderHash = mat.shader.name;
+
+                if (!shaderByHash.ContainsKey(shaderHash))
+                {
+                    if (!mat.shader.name.Contains("Error"))
+                    {
+                        shaderByHash.Add(shaderHash, Shader.Find(mat.shader.name));
+                    }
+                    else
+                    {
+                        shaderByHash.Add(shaderHash, EnsureMainShader());
+                    }
+                }
+
+                mat.shader = shaderByHash[shaderHash];
+            }
+
+            //NOTE(Brian): Have to copy material because will be unloaded later.
+            var materialCopy = new Material(mat);
+            SRPBatchingHelper.OptimizeMaterial(materialCopy);
+
+            if ((cachingFlags & Mode.CACHE_MATERIALS) != 0)
+            {
+                int crc = mat.ComputeCRC();
+                string hash = crc.ToString();
+
+                RefCountedMaterialData refCountedMat;
+
+                if (!PersistentAssetCache.MaterialCacheByCRC.ContainsKey(hash))
+                {
+#if UNITY_EDITOR
+                    materialCopy.name += $" (crc: {materialCopy.ComputeCRC()})";
+#endif
+                    PersistentAssetCache.MaterialCacheByCRC.Add(hash, new RefCountedMaterialData(hash, materialCopy));
+                }
+
+                refCountedMat = PersistentAssetCache.MaterialCacheByCRC[hash];
+                refCountedMat.IncreaseRefCount();
+                return refCountedMat.material;
+            }
+
+            return materialCopy;
+        }
+
         public static IEnumerator Process(List<Renderer> renderers, bool enableRenderers = true, Mode cachingFlags = Mode.CACHE_EVERYTHING)
         {
             if (renderers == null)
@@ -67,55 +115,7 @@ namespace DCL.Helpers
 
                     float elapsedTime = Time.realtimeSinceStartup;
 
-                    if ((cachingFlags & Mode.CACHE_SHADERS) != 0)
-                    {
-                        string shaderHash = mat.shader.name;
-
-                        if (!shaderByHash.ContainsKey(shaderHash))
-                        {
-                            if (!mat.shader.name.Contains("Error"))
-                            {
-                                shaderByHash.Add(shaderHash, Shader.Find(mat.shader.name));
-                            }
-                            else
-                            {
-                                shaderByHash.Add(shaderHash, EnsureMainShader());
-                            }
-                        }
-
-                        mat.shader = shaderByHash[shaderHash];
-                    }
-
-                    if ((cachingFlags & Mode.CACHE_MATERIALS) != 0)
-                    {
-                        int crc = mat.ComputeCRC();
-                        string hash = crc.ToString();
-
-                        RefCountedMaterialData refCountedMat;
-
-                        if (!PersistentAssetCache.MaterialCacheByCRC.ContainsKey(hash))
-                        {
-                            //NOTE(Brian): Have to copy material because will be unloaded later.
-                            var materialCopy = new Material(mat);
-
-#if UNITY_EDITOR
-                            materialCopy.name += $" (crc: {materialCopy.ComputeCRC()})";
-#endif
-
-                            SRPBatchingHelper.OptimizeMaterial(materialCopy);
-                            PersistentAssetCache.MaterialCacheByCRC.Add(hash, new RefCountedMaterialData(hash, materialCopy));
-                        }
-
-                        refCountedMat = PersistentAssetCache.MaterialCacheByCRC[hash];
-                        refCountedMat.IncreaseRefCount();
-                        matList.Add(refCountedMat.material);
-                    }
-                    else
-                    {
-                        var materialCopy = new Material(mat);
-                        SRPBatchingHelper.OptimizeMaterial(materialCopy);
-                        matList.Add(materialCopy);
-                    }
+                    matList.Add( ProcessSingleMaterial(mat, cachingFlags) );
 
                     if (timeBudgetEnabled)
                     {

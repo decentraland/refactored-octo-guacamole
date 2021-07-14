@@ -1,6 +1,8 @@
+using System;
 using DCL.Helpers;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class AvatarName : MonoBehaviour
 {
@@ -44,6 +46,7 @@ public class AvatarName : MonoBehaviour
         {
             talkingAnimator.gameObject.SetActive(talking);
         }
+
         talkingAnimator.SetBool(VOICE_CHAT_ANIMATOR_TALKING, talking);
     }
 
@@ -52,6 +55,7 @@ public class AvatarName : MonoBehaviour
         canvas = GetComponentInParent<Canvas>();
         canvasRect = (RectTransform)canvas.transform;
         talkingAnimator?.gameObject.SetActive(false);
+        canvas.enabled = false;
     }
 
     void OnEnable()
@@ -60,7 +64,34 @@ public class AvatarName : MonoBehaviour
         mainCamera = Camera.main;
     }
 
-    void LateUpdate()
+    public void Update()
+    {
+        if ( Input.GetKeyUp(KeyCode.H) )
+        {
+            canvas.enabled = !canvas.enabled;
+
+            if ( canvas.enabled )
+            {
+                RenderPipelineManager.beginFrameRendering += BeginFrameRendering;
+            }
+            else
+            {
+                RenderPipelineManager.beginFrameRendering -= BeginFrameRendering;
+            }
+        }
+    }
+
+    private void OnDisable()
+    {
+        RenderPipelineManager.beginFrameRendering -= BeginFrameRendering;
+    }
+
+    private void OnDestroy()
+    {
+        RenderPipelineManager.beginFrameRendering -= BeginFrameRendering;
+    }
+
+    void BeginFrameRendering(ScriptableRenderContext scriptableRenderContext, Camera[] cameras)
     {
         if (string.IsNullOrEmpty(nameText.text))
             return;

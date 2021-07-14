@@ -2,6 +2,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using DCL.Helpers;
+using UnityEditor;
 using UnityEngine;
 using static WearableLiterals;
 
@@ -17,6 +19,7 @@ namespace DCL
 
         private const int MAX_RETRIES = 5;
 
+        public Material lightweightMat;
         public Material defaultMaterial;
         public Material eyeMaterial;
         public Material eyebrowMaterial;
@@ -367,6 +370,7 @@ namespace DCL
                 stickersController?.PlayEmote(model.stickerTriggerId);
             }
 
+
             if (loadSoftFailed)
             {
                 OnFailEvent?.Invoke(false);
@@ -374,7 +378,52 @@ namespace DCL
             else
             {
                 OnSuccessEvent?.Invoke();
+                AvatarMergeTest();
             }
+        }
+
+        private Mesh combinedAvatarMesh;
+        private GameObject combinedAvatar;
+
+        [ContextMenu("Show Bones")]
+        public void ShowBones()
+        {
+            Transform[] bones = combinedAvatar.GetComponent<SkinnedMeshRenderer>().bones;
+
+            for ( int i = 0; i < bones.Length; i++ )
+            {
+                Debug.DrawLine(bones[i].transform.position, bones[i].transform.position + Vector3.up * 0.1f, Color.red, 10.0f);
+            }
+        }
+
+        void AvatarMergeTest()
+        {
+            if ( combinedAvatar != null )
+                combinedAvatar.GetComponent<SkinnedMeshRenderer>().enabled = false;
+
+            GameObject newCombinedAvatar = AvatarMeshCombiner.Combine(
+                bodyShapeController.skinnedMeshRenderer,
+                transform,
+                (r) => !r.transform.parent.gameObject.name.Contains("Mask"));
+
+            if ( newCombinedAvatar == null )
+            {
+                if ( combinedAvatar != null )
+                    combinedAvatar.GetComponent<SkinnedMeshRenderer>().enabled = true;
+
+                return;
+            }
+
+            Mesh newCombinedAvatarMesh = newCombinedAvatar.GetComponent<SkinnedMeshRenderer>().sharedMesh;
+
+            if ( combinedAvatar != null )
+                Destroy(combinedAvatar);
+
+            if ( combinedAvatarMesh != null )
+                Destroy(combinedAvatarMesh);
+
+            combinedAvatar = newCombinedAvatar;
+            combinedAvatarMesh = newCombinedAvatarMesh;
         }
 
         void OnWearableLoadingSuccess(WearableController wearableController)
@@ -429,6 +478,14 @@ namespace DCL
             model.expressionTriggerId = id;
             model.expressionTriggerTimestamp = timestamp;
             animator.SetExpressionValues(id, timestamp);
+        }
+
+        void Update()
+        {
+            if ( Input.GetKeyDown(KeyCode.J))
+            {
+                combinedAvatar.GetComponent<SkinnedMeshRenderer>().sharedMaterial = lightweightMat;
+            }
         }
 
         private void AddWearableController(WearableItem wearable)

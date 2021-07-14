@@ -22,7 +22,7 @@ public static class AvatarUtils
         Func<Material, Material> mapFunction,
         string materialsContainingThisName = null)
     {
-        Renderer[] renderers = transformRoot.GetComponentsInChildren<Renderer>();
+        Renderer[] renderers = transformRoot.GetComponentsInChildren<Renderer>(true);
 
         for (int i = 0; i < renderers.Length; i++)
         {
@@ -36,15 +36,21 @@ public static class AvatarUtils
                 if (m == null)
                     continue;
 
-                string materialName = m.name.ToLower();
+                bool materialNameIsCorrect = true;
 
-                if (string.IsNullOrEmpty(materialsContainingThisName) || materialName.Contains(materialsContainingThisName.ToLower()))
+                if ( !string.IsNullOrEmpty(materialsContainingThisName) )
                 {
-                    string newMatName = sharedMats[i1].name;
-                    Material newMat = mapFunction.Invoke(sharedMats[i1]);
-                    newMat.name = newMatName;
-                    sharedMats[i1] = newMat;
+                    string materialName = m.name.ToLower();
+                    materialNameIsCorrect = materialName.Contains(materialsContainingThisName.ToLower());
                 }
+
+                if (!materialNameIsCorrect)
+                    continue;
+
+                string newMatName = sharedMats[i1].name;
+                Material newMat = mapFunction.Invoke(sharedMats[i1]);
+                newMat.name = newMatName;
+                sharedMats[i1] = newMat;
             }
 
             r.sharedMaterials = sharedMats;
@@ -120,6 +126,7 @@ public static class AvatarUtils
                 if (_MatCap != null)
                     copy.SetTexture(ShaderUtils.MatCap, _MatCap);
 
+                //copy = MaterialCachingHelper.ProcessSingleMaterial(copy);
                 SRPBatchingHelper.OptimizeMaterial(copy);
 
                 result.Add(copy);

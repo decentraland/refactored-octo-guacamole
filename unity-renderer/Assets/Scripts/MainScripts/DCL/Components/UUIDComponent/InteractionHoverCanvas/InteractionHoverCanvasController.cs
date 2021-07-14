@@ -3,6 +3,7 @@ using DCL.Components;
 using UnityEngine;
 using TMPro;
 using System.Collections.Generic;
+using System.Linq;
 using DCL;
 
 public class InteractionHoverCanvasController : MonoBehaviour
@@ -27,6 +28,10 @@ public class InteractionHoverCanvasController : MonoBehaviour
     {
         i = this;
         mainCamera = Camera.main;
+
+        buttonToIcon.Add( ACTION_BUTTON_POINTER, icons[0] );
+        buttonToIcon.Add( ACTION_BUTTON_PRIMARY, icons[1] );
+        buttonToIcon.Add( ACTION_BUTTON_SECONDARY, icons[2] );
     }
 
     public void Setup(string button, string feedbackText, IDCLEntity entity)
@@ -39,27 +44,26 @@ public class InteractionHoverCanvasController : MonoBehaviour
         canvas.enabled = enabled && isHovered;
     }
 
+    private static Dictionary<string, GameObject> buttonToIcon = new Dictionary<string, GameObject>();
+    private string currentButton;
+
     void ConfigureIcon(string button)
     {
-        hoverIcon?.SetActive(false);
+        if ( currentButton == button )
+            return;
 
-        switch (button)
-        {
-            case ACTION_BUTTON_POINTER:
-                hoverIcon = icons[0];
-                break;
-            case ACTION_BUTTON_PRIMARY:
-                hoverIcon = icons[1];
-                break;
-            case ACTION_BUTTON_SECONDARY:
-                hoverIcon = icons[2];
-                break;
-            default: // ANY
-                hoverIcon = icons[3];
-                break;
-        }
+        currentButton = button;
 
-        hoverIcon.SetActive(true);
+        if ( hoverIcon != null && hoverIcon.activeSelf )
+            hoverIcon.SetActive(false);
+
+        if (buttonToIcon.ContainsKey(button))
+            hoverIcon = buttonToIcon[button];
+        else
+            hoverIcon = icons[3];
+
+        if ( !hoverIcon.activeSelf )
+            hoverIcon.SetActive(true);
     }
 
     public void SetHoverState(bool hoverState)

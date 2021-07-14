@@ -27,20 +27,7 @@ namespace DCL
 
         Transform avatarTransformValue;
 
-        Vector3 currentPosition
-        {
-            get { return currentWorldPosition; }
-            set
-            {
-                currentWorldPosition = value;
-                avatarTransform.position = PositionUtils.WorldToUnityPosition(currentWorldPosition);
-            }
-        }
-
         Vector3 currentWorldPosition = Vector3.zero;
-
-        Quaternion currentRotation { get { return avatarTransform.rotation; } set { avatarTransform.rotation = value; } }
-
         Vector3 targetPosition;
         Quaternion targetRotation;
 
@@ -73,7 +60,8 @@ namespace DCL
         {
             if (immediate)
             {
-                currentPosition = position;
+                currentWorldPosition = position;
+                avatarTransform.position = PositionUtils.WorldToUnityPosition(currentWorldPosition);
                 avatarTransform.rotation = rotation;
             }
 
@@ -83,6 +71,7 @@ namespace DCL
 
             targetPosition = position;
             targetRotation = rotation;
+            moveIsDirty = true;
 
             float distance = Vector3.Distance(targetPosition, currentWorldPosition);
 
@@ -101,23 +90,32 @@ namespace DCL
             }
         }
 
+        private bool moveIsDirty;
+
         void UpdateLerp(float deltaTime)
         {
-            if (Vector3.SqrMagnitude(currentPosition - targetPosition) < SPEED_EPSILON)
+            if ( !moveIsDirty )
             {
                 UpdateRotation(deltaTime, targetRotation);
                 return;
             }
 
+            moveIsDirty = Vector3.SqrMagnitude(currentWorldPosition - targetPosition) >= SPEED_EPSILON;
+
             //NOTE(Brian): When we update movement we don't update rotation, because the Avatar will face the movement forward vector.
             UpdateMovement(deltaTime);
         }
 
-        private void UpdateRotation(float deltaTime, Quaternion targetRotation) { currentRotation = Quaternion.Slerp(currentRotation, targetRotation, ROTATION_SPEED * deltaTime); }
+        private void UpdateRotation(float deltaTime, Quaternion targetRotation)
+        {
+            Quaternion rot = avatarTransformValue.rotation;
+            rot = Quaternion.Slerp(rot, targetRotation, ROTATION_SPEED * deltaTime);
+            avatarTransformValue.rotation = rot;
+        }
 
         private void UpdateMovement(float deltaTime)
         {
-            Vector3 flattenedDiff = targetPosition - currentPosition;
+            Vector3 flattenedDiff = targetPosition - currentWorldPosition;
             flattenedDiff.y = 0;
 
             //NOTE(Brian): Avoid Unity error when computing look rotation for 0 magnitude vectors.
@@ -129,19 +127,19 @@ namespace DCL
                 UpdateRotation(deltaTime, lookRotation);
             }
 
-            Vector3 direction = (targetPosition - currentPosition).normalized;
+            Vector3 direction = (targetPosition - currentWorldPosition).normalized;
             Vector3 delta = direction * (movementSpeed * deltaTime);
 
             //NOTE(Brian): We need a separate value for Y movement because the gravity has to be lerped faster.
             delta.y = direction.y * SPEED_GRAVITY * deltaTime;
 
             //NOTE(Brian): If we overshoot targetPosition we adjust the delta value accordingly.
-            if (delta.sqrMagnitude > Vector3.SqrMagnitude(targetPosition - currentPosition))
+            if (delta.sqrMagnitude > Vector3.SqrMagnitude(targetPosition - currentWorldPosition))
             {
-                delta = targetPosition - currentPosition;
+                delta = targetPosition - currentWorldPosition;
             }
 
-            currentPosition += delta;
+            currentWorldPosition += delta;
         }
 
         void Update()

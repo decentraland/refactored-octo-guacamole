@@ -138,24 +138,6 @@ public class BodyShapeController : WearableController, IBodyShapeController
 
         animation.cullingType = AnimationCullingType.BasedOnRenderers;
 
-        //We create a mock SkinnedMeshRenderer to hold the bones for the animations,
-        //since any of the others SkinnedMeshRenderers in the bodyshape can be disabled arbitrarily
-        SkinnedMeshRenderer[] skinnedMeshRenderersInChild = assetContainer.GetComponentsInChildren<SkinnedMeshRenderer>();
-        skinnedMeshRenderer = animation.gameObject.GetOrCreateComponent<SkinnedMeshRenderer>();
-        skinnedMeshRenderer.enabled = true;
-        foreach (SkinnedMeshRenderer meshRenderer in skinnedMeshRenderersInChild)
-        {
-            if (skinnedMeshRenderer != meshRenderer)
-            {
-                skinnedMeshRenderer.rootBone = meshRenderer.rootBone;
-                skinnedMeshRenderer.bones = meshRenderer.bones;
-                break;
-            }
-        }
-
-        var animator = animationTarget.GetComponent<AvatarAnimatorLegacy>();
-        animator.BindBodyShape(animation, bodyShapeId, animationTarget);
-
         var allRenderers = assetContainer.GetComponentsInChildren<SkinnedMeshRenderer>(true);
 
         foreach (var r in allRenderers)
@@ -177,6 +159,17 @@ public class BodyShapeController : WearableController, IBodyShapeController
             else if (parentName.Contains("mouth"))
                 mouthRenderer = r;
         }
+
+        //We create a mock SkinnedMeshRenderer to hold the bones for the animations,
+        //since any of the others SkinnedMeshRenderers in the bodyshape can be disabled arbitrarily
+        skinnedMeshRenderer = animation.gameObject.GetOrCreateComponent<SkinnedMeshRenderer>();
+        skinnedMeshRenderer.enabled = true;
+        skinnedMeshRenderer.rootBone = upperBodyRenderer.rootBone;
+        skinnedMeshRenderer.bones = upperBodyRenderer.bones;
+        skinnedMeshRenderer.localBounds = upperBodyRenderer.localBounds;
+
+        var animator = animationTarget.GetComponent<AvatarAnimatorLegacy>();
+        animator.BindBodyShape(animation, bodyShapeId, animationTarget);
 
         InitializeAvatarAudioHandlers(assetContainer, animation);
     }

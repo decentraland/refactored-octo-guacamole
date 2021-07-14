@@ -63,7 +63,14 @@ public class AvatarAnimatorLegacy : MonoBehaviour, IPoolLifecycleHandler
     AvatarAnimationsVariable currentAnimations;
     bool isOwnPlayer = false;
 
-    public void Start() { OnPoolGet(); }
+    private static int maxInstances;
+    private int instanceId;
+    const int ANIMATION_UPDATE_BATCHES = 25;
+
+    public void Start()
+    {
+        OnPoolGet();
+    }
 
     public void OnPoolGet()
     {
@@ -80,6 +87,11 @@ public class AvatarAnimatorLegacy : MonoBehaviour, IPoolLifecycleHandler
             }
         }
 
+        firstUpdate = true;
+        instanceId = maxInstances;
+        currentGroundSubstate = -1;
+        isBodyShapeBound = false;
+        maxInstances++;
         currentState = State_Init;
     }
 
@@ -89,9 +101,30 @@ public class AvatarAnimatorLegacy : MonoBehaviour, IPoolLifecycleHandler
         {
             DCLCharacterController.i.OnUpdateFinish -= Update;
         }
+
+        maxInstances--;
     }
 
-    void Update() { Update(Time.deltaTime); }
+    private bool firstUpdate = true;
+
+    void Update()
+    {
+        if ( isBodyShapeBound )
+        {
+            bool updateThisFrame = maxInstances < ANIMATION_UPDATE_BATCHES || (Time.frameCount % (maxInstances / ANIMATION_UPDATE_BATCHES)) == (instanceId / ANIMATION_UPDATE_BATCHES);
+
+            if ( firstUpdate || updateThisFrame )
+                animation.Sample();
+
+            //enabled = true;
+            // else
+            //     animation.enabled = false;
+
+            firstUpdate = false;
+        }
+
+        Update(Time.deltaTime);
+    }
 
     void Update(float deltaTime)
     {
@@ -105,7 +138,9 @@ public class AvatarAnimatorLegacy : MonoBehaviour, IPoolLifecycleHandler
 
     void UpdateInterface()
     {
-        Vector3 velocityTargetPosition = target.position;
+        DCLCharacterController characterController = DCLCharacterController.i;
+        Vector3 targetPosition = target.position;
+        Vector3 velocityTargetPosition = targetPosition;
         Vector3 flattenedVelocity = velocityTargetPosition - lastPosition;
 
         //NOTE(Brian): Vertical speed
@@ -115,19 +150,22 @@ public class AvatarAnimatorLegacy : MonoBehaviour, IPoolLifecycleHandler
         flattenedVelocity.y = 0;
 
         if (isOwnPlayer)
-            blackboard.movementSpeed = flattenedVelocity.magnitude - DCLCharacterController.i.movingPlatformSpeed;
+            blackboard.movementSpeed = flattenedVelocity.magnitude - characterController.movingPlatformSpeed;
         else
             blackboard.movementSpeed = flattenedVelocity.magnitude;
 
         Vector3 rayOffset = Vector3.up * RAY_OFFSET_LENGTH;
-        //NOTE(Brian): isGrounded?
-        blackboard.isGrounded = Physics.Raycast(target.transform.position + rayOffset,
-            Vector3.down,
-            RAY_OFFSET_LENGTH - ELEVATION_OFFSET,
-            DCLCharacterController.i.groundLayers);
 
+        if ( Mathf.Abs(verticalVelocity) > 0.001f )
+        {
+            //NOTE(Brian): isGrounded?
+            blackboard.isGrounded = Physics.Raycast(targetPosition + rayOffset,
+                Vector3.down,
+                RAY_OFFSET_LENGTH - ELEVATION_OFFSET,
+                characterController.groundLayers);
+        }
 #if UNITY_EDITOR
-        Debug.DrawRay(target.transform.position + rayOffset, Vector3.down * (RAY_OFFSET_LENGTH - ELEVATION_OFFSET), blackboard.isGrounded ? Color.green : Color.red);
+        Debug.DrawRay(targetPosition + rayOffset, Vector3.down * (RAY_OFFSET_LENGTH - ELEVATION_OFFSET), blackboard.isGrounded ? Color.green : Color.red);
 #endif
 
         lastPosition = velocityTargetPosition;
@@ -153,22 +191,41 @@ public class AvatarAnimatorLegacy : MonoBehaviour, IPoolLifecycleHandler
             return;
         }
 
-        animation[baseClipsIds.run].normalizedSpeed = bb.movementSpeed / bb.deltaTime * bb.runSpeedFactor;
-        animation[baseClipsIds.walk].normalizedSpeed = bb.movementSpeed / bb.deltaTime * bb.walkSpeedFactor;
+        runAnimState.normalizedSpeed = bb.movementSpeed / bb.deltaTime * bb.runSpeedFactor;
+        walkAnimState.normalizedSpeed = bb.movementSpeed / bb.deltaTime * bb.walkSpeedFactor;
 
         float movementSpeed = bb.movementSpeed / bb.deltaTime;
+        int subState = 0;
 
         if (movementSpeed > runMinSpeed)
         {
-            animation.CrossFade(baseClipsIds.run, RUN_TRANSITION_TIME);
+            subState = 0;
         }
         else if (movementSpeed > walkMinSpeed)
         {
-            animation.CrossFade(baseClipsIds.walk, WALK_TRANSITION_TIME);
+            subState = 1;
         }
         else
         {
-            animation.CrossFade(baseClipsIds.idle, IDLE_TRANSITION_TIME);
+            subState = 2;
+        }
+
+        if ( currentGroundSubstate != subState )
+        {
+            currentGroundSubstate = subState;
+
+            switch ( subState )
+            {
+                case 0:
+                    animation.CrossFade(baseClipsIds.run, RUN_TRANSITION_TIME);
+                    break;
+                case 1:
+                    animation.CrossFade(baseClipsIds.walk, WALK_TRANSITION_TIME);
+                    break;
+                case 2:
+                    animation.CrossFade(baseClipsIds.idle, IDLE_TRANSITION_TIME);
+                    break;
+            }
         }
 
         if (!bb.isGrounded)
@@ -177,6 +234,8 @@ public class AvatarAnimatorLegacy : MonoBehaviour, IPoolLifecycleHandler
             Update(bb.deltaTime);
         }
     }
+
+    private int currentGroundSubstate = -1;
 
     void State_Air(BlackBoard bb)
     {
@@ -250,6 +309,10 @@ public class AvatarAnimatorLegacy : MonoBehaviour, IPoolLifecycleHandler
 
     public void SetIdleFrame() { animation.Play(baseClipsIds.idle); }
 
+    private AnimationState runAnimState;
+    private AnimationState walkAnimState;
+    private bool isBodyShapeBound;
+
     public void BindBodyShape(Animation animation, string bodyShapeType, Transform target)
     {
         this.target = target;
@@ -274,6 +337,10 @@ public class AvatarAnimatorLegacy : MonoBehaviour, IPoolLifecycleHandler
                 this.animation.AddClip(animationToId.clip, animationToId.id);
             }
         }
+
+        runAnimState = animation[baseClipsIds.run];
+        walkAnimState = animation[baseClipsIds.walk];
+        isBodyShapeBound = true;
 
         SetIdleFrame();
     }

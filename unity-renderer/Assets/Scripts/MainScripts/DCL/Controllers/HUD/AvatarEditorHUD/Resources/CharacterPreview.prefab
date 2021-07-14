@@ -397,13 +397,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 53a4f52c7cc5dc348ab140ed3238943a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  lightweightMat: {fileID: 2100000, guid: c27d60a72e5b77748bd23149c72355fe, type: 2}
   defaultMaterial: {fileID: 2100000, guid: 77828a2ff3421ba42a6b4cc7e9a9061e, type: 2}
   eyeMaterial: {fileID: 2100000, guid: fcfa021e0982c0840aaefe7411340f7f, type: 2}
   eyebrowMaterial: {fileID: 2100000, guid: db9e974bee285614b8ea2d8832d1a563, type: 2}
   mouthMaterial: {fileID: 2100000, guid: aa8f029bd537edb44b72b4737ca9b81d, type: 2}
-  useFx: 0
-  fxSpawnPrefab: {fileID: 4461659837953358430, guid: a409a73da0b844cf28dfb4e8066f3fdd,
-    type: 3}
 --- !u!1 &7113636141788214316
 GameObject:
   m_ObjectHideFlags: 0

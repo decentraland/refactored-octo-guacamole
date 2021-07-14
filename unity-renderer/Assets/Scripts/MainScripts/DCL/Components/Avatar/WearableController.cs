@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityGLTF.Cache;
 using Object = UnityEngine.Object;
 
 public class WearableController
@@ -59,7 +60,7 @@ public class WearableController
 
         loader.settings.forceNewInstance = false;
         loader.settings.initialLocalPosition = Vector3.up * 0.75f;
-        loader.settings.cachingFlags = MaterialCachingHelper.Mode.CACHE_SHADERS;
+        loader.settings.cachingFlags = MaterialCachingHelper.Mode.CACHE_EVERYTHING;
         loader.settings.visibleFlags = AssetPromiseSettings_Rendering.VisibleFlags.INVISIBLE;
         loader.settings.parent = parent;
         loader.settings.layer = parent.gameObject.layer;
@@ -187,7 +188,7 @@ public class WearableController
 
         for (var i = 0; i < materials.Count; i++)
         {
-            Object.Destroy(materials[i]);
+            PersistentAssetCache.MaterialCacheByCRC.Remove(materials[i].ComputeCRC().ToString());
         }
     }
 

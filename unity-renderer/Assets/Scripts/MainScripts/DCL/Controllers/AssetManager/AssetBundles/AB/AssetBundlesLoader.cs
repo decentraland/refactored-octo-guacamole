@@ -38,16 +38,16 @@ namespace DCL
 
         private Dictionary<string, int> loadOrderByExtension = new Dictionary<string, int>()
         {
-            {"png", 0},
-            {"jpg", 1},
-            {"peg", 2},
-            {"bmp", 3},
-            {"psd", 4},
-            {"iff", 5},
-            {"mat", 6},
-            {"nim", 7},
-            {"ltf", 8},
-            {"glb", 9}
+            { "png", 0 },
+            { "jpg", 1 },
+            { "peg", 2 },
+            { "bmp", 3 },
+            { "psd", 4 },
+            { "iff", 5 },
+            { "mat", 6 },
+            { "nim", 7 },
+            { "ltf", 8 },
+            { "glb", 9 }
         };
 
         private List<UnityEngine.Object> loadedAssetsByName = new List<UnityEngine.Object>();
@@ -145,7 +145,7 @@ namespace DCL
             {
                 string ext = "any";
 
-                if (loadedAsset is Texture)
+                if (loadedAsset is Texture textureAsset)
                 {
                     ext = "png";
                 }
@@ -172,7 +172,7 @@ namespace DCL
                     {
                         assetBundleInfo.asset.assetsByExtension.Add(ext, new List<UnityEngine.Object>());
                     }
-                    
+
                     assetBundleInfo.asset.assetsByExtension[ext].Add(loadedAsset);
                 }
             }
