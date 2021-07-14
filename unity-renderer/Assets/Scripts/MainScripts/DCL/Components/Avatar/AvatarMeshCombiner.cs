@@ -190,7 +190,7 @@ namespace DCL
             //result.AddComponent<MeshFilter>().sharedMesh = finalMesh;
             //result.AddComponent<MeshRenderer>().sharedMaterials = newSkinnedMeshRenderer.sharedMaterials;
 
-            result.transform.parent = root;
+            result.transform.parent = null;
 
             return result;
         }
