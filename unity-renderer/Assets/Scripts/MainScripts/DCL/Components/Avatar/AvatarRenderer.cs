@@ -19,6 +19,7 @@ namespace DCL
 
         private const int MAX_RETRIES = 5;
 
+        public Material lightweightMat;
         public Material defaultMaterial;
         public Material eyeMaterial;
         public Material eyebrowMaterial;
@@ -477,6 +478,14 @@ namespace DCL
             model.expressionTriggerId = id;
             model.expressionTriggerTimestamp = timestamp;
             animator.SetExpressionValues(id, timestamp);
+        }
+
+        void Update()
+        {
+            if ( Input.GetKeyDown(KeyCode.J))
+            {
+                combinedAvatar.GetComponent<SkinnedMeshRenderer>().sharedMaterial = lightweightMat;
+            }
         }
 
         private void AddWearableController(WearableItem wearable)
