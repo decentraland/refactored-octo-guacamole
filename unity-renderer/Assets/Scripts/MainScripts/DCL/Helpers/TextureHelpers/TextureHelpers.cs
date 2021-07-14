@@ -33,21 +33,18 @@ public static class TextureHelpers
 
     public static Texture2D Resize(Texture2D source, int newWidth, int newHeight)
     {
-        source.filterMode = FilterMode.Point;
-
         RenderTexture rt = RenderTexture.GetTemporary(newWidth, newHeight);
+
+        source.filterMode = FilterMode.Point;
         rt.filterMode = FilterMode.Point;
 
-        RenderTexture.active = rt;
         Graphics.Blit(source, rt);
 
-        Texture2D nTex = new Texture2D(newWidth, newHeight);
-        nTex.ReadPixels(new Rect(0, 0, newWidth, newWidth), 0, 0);
-        nTex.Apply();
+        Texture2D nTex = new Texture2D(newWidth, newHeight, TextureFormat.ARGB32, false);
+
+        Graphics.CopyTexture(rt, nTex);
 
         RenderTexture.ReleaseTemporary(rt);
-        RenderTexture.active = null;
-
         return nTex;
     }
 
