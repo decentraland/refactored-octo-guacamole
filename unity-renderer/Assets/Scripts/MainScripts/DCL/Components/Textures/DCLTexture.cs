@@ -29,7 +29,7 @@ namespace DCL
             MIRROR
         }
 
-        AssetPromise_Texture texturePromise = null;
+        public AssetPromise_Texture texturePromise { private set; get; } = null;
 
         public TextureWrapMode unityWrap;
         public FilterMode unitySamplingMode;
@@ -136,7 +136,14 @@ namespace DCL
                         if (texturePromise != null)
                             AssetPromiseKeeper_Texture.i.Forget(texturePromise);
 
-                        texturePromise = new AssetPromise_Texture(contentsUrl, unityWrap, unitySamplingMode, storeDefaultTextureInAdvance: true);
+                        texturePromise = new AssetPromise_Texture(contentsUrl, new AssetPromise_Texture_Settings()
+                        {
+                            wrapMode = unityWrap,
+                            filterMode = unitySamplingMode,
+                            storeDefaultTextureInAdvance = true,
+                            storeTexAsNonReadable = true,
+                            limitTextureSize = true
+                        });
                         texturePromise.OnSuccessEvent += (x) => texture = x.texture;
                         texturePromise.OnFailEvent += (x) => { texture = null; };
 

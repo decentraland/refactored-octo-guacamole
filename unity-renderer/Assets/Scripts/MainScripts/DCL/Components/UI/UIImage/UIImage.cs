@@ -30,6 +30,8 @@ namespace DCL.Components
         public override string referencesContainerPrefabName => "UIImage";
 
         DCLTexture dclTexture = null;
+        private int originalWidth;
+        private int originalHeight;
 
         public UIImage() { model = new Model(); }
 
@@ -59,6 +61,15 @@ namespace DCL.Components
                     IEnumerator fetchIEnum = DCLTexture.FetchTextureComponent(scene, model.source, (downloadedTexture) =>
                     {
                         referencesContainer.image.texture = downloadedTexture.texture;
+                        originalWidth = downloadedTexture.texture.width;
+                        originalHeight = downloadedTexture.texture.height;
+
+                        if (downloadedTexture.texturePromise?.asset != null)
+                        {
+                            originalWidth = downloadedTexture.texturePromise.asset.originalWidth;
+                            originalHeight = downloadedTexture.texturePromise.asset.originalHeight;
+                        }
+
                         fetchRoutine = null;
                         dclTexture?.DetachFrom(this);
                         dclTexture = downloadedTexture;
@@ -99,14 +110,14 @@ namespace DCL.Components
 
             // Configure uv rect
             Vector2 normalizedSourceCoordinates = new Vector2(
-                model.sourceLeft / referencesContainer.image.texture.width,
-                -model.sourceTop / referencesContainer.image.texture.height);
+                model.sourceLeft / originalWidth,
+                -model.sourceTop / originalHeight);
 
             Vector2 normalizedSourceSize = new Vector2(
                 model.sourceWidth * (model.sizeInPixels ? 1f : parentRecTransform.rect.width) /
-                referencesContainer.image.texture.width,
+                originalWidth,
                 model.sourceHeight * (model.sizeInPixels ? 1f : parentRecTransform.rect.height) /
-                referencesContainer.image.texture.height);
+                originalHeight);
 
             referencesContainer.image.uvRect = new Rect(normalizedSourceCoordinates.x,
                 normalizedSourceCoordinates.y + (1 - normalizedSourceSize.y),
