@@ -8,7 +8,10 @@
 set -u # no unbound variables
 
 # Upload artifacts
-aws s3 sync /tmp/workspace/unity-renderer/browser-interface/dist "s3://${S3_BUCKET}/branch/${CIRCLE_BRANCH}" --acl public-read
+npx @dcl/cdn-uploader@next \
+  --bucket "$S3_BUCKET" \
+  --local-folder "/tmp/workspace/unity-renderer/browser-interface/dist" \
+  --bucket-folder "branch/${CIRCLE_BRANCH}"
 
 # Invalidate cache
 aws configure set preview.cloudfront true

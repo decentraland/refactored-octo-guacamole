@@ -19,6 +19,7 @@
     "forceConsistentCasingInFileNames": true,
     "noUnusedParameters": true,
     "noUnusedLocals": true,
+    "resolveJsonModule": true,
     "types": [],
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,

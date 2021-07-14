@@ -7,7 +7,8 @@ import { OutputOptions, rollup } from "rollup"
 import typescript from "rollup-plugin-typescript2"
 import resolve from "rollup-plugin-node-resolve"
 import commonjs from "rollup-plugin-commonjs"
-// import globals from "rollup-plugin-node-globals"
+import rollupJson from "@rollup/plugin-json"
+import { generatedFiles } from "../package.json"
 
 const PROD = !!process.env.CI
 
@@ -28,8 +29,7 @@ const plugins = [
     include: [/node_modules/],
     namedExports: {},
   }),
-
-  // globals({}),
+  rollupJson({ preferConst: true }),
 ]
 
 process.env.BUILD_PATH = path.resolve(
@@ -57,6 +57,10 @@ async function buildRollup() {
   console.log("> reading unity.loader.js")
   const banner = readFileSync(path.resolve(DIST_PATH, "unity.loader.js")).toString()
   console.log("> compiling src folder")
+
+  for (let file of Object.values(generatedFiles)) {
+    ensureFileExists(DIST_PATH, file)
+  }
 
   const bundle = await rollup({
     input: "./src/index.ts",

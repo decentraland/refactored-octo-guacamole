@@ -13,6 +13,7 @@
     "declarationMap": true,
     "moduleResolution": "node",
     "stripInternal": true,
+    "resolveJsonModule": true,
     "strict": true,
     "pretty": true,
     "forceConsistentCasingInFileNames": true,
