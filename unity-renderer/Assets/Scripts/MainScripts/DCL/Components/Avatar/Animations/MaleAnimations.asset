@@ -43,3 +43,15 @@ MonoBehaviour:
     id: tik
   - clip: {fileID: 7400000, guid: 642c7f952a6a39145a3e15f25654f8d5, type: 2}
     id: tektonik
+  - clip: {fileID: 7400000, guid: 9475b3f1b6d0bec4199599d7e60d4786, type: 2}
+    id: dontsee
+  - clip: {fileID: 7400000, guid: 0766769861ef79f4a8290532f12dba22, type: 2}
+    id: handsair
+  - clip: {fileID: 7400000, guid: 35376f228f19d0a41b260d754ef21ae0, type: 2}
+    id: shrug
+  - clip: {fileID: 7400000, guid: 3e0e78f668397014a9fe1da22b9d34b7, type: 2}
+    id: disco
+  - clip: {fileID: 7400000, guid: d46b1af13bd8fd94eabb1ee09e49475e, type: 2}
+    id: dab
+  - clip: {fileID: 7400000, guid: e9118272c0ad59d418b397e5951b80aa, type: 2}
+    id: headexplode
