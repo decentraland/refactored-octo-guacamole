@@ -8,6 +8,7 @@ source ci-setup.sh
 mkdir -p "$OUTPUT_DIR"
 
 echo "Running AB conversor for sceneId $SCENE_ID at $CONTENT_URL > $OUTPUT_DIR"
+echo "Project path: $PROJECT_PATH"
 
 xvfb-run --auto-servernum --server-args='-screen 0 640x480x24' "$UNITY_PATH/Editor/Unity" \
   -batchmode \
