@@ -1,41 +1,42 @@
 {
-  "name": "VisualTests",
-  "rootNamespace": "",
-  "references": [
-    "GUID:e555144732b726c4cba5b0f6337fea75",
-    "GUID:cc6bfabbfe87b7949aa248893f89ce37",
-    "GUID:760a1d365aad58044916992b072cf2a6",
-    "GUID:b1087c5731ff68448a0a9c625bb7e52d",
-    "GUID:ef84d7ce90ba34f07be26ace428e9bc8",
-    "GUID:27619889b8ba8c24980f49ee34dbb44a",
-    "GUID:0acc523941302664db1f4e527237feb3",
-    "GUID:a881b57670b1d2747a6d7f9e32b63230",
-    "GUID:a3ceb534947fac14da25035bc5c24788",
-    "GUID:3f13bd1a926f03a4cab988f06a80c1fd",
-    "GUID:6dacc6cde5056a34c9488c309ca0a18a",
-    "GUID:a78c5d8dad39efe45ab1b21901f8db0f",
-    "GUID:b308ae946900fa04080222d7daf47d9a",
-    "GUID:97d8897529779cb49bebd400c7f402a6",
-    "GUID:5289a39f46259954ca74010d7c9ded16",
-    "GUID:fbcc413e192ef9048811d47ab0aca0c0",
-    "GUID:3047fd2f05bcaae498a99a3f9321f9a8",
-    "GUID:edd6917fa0e214e44b6592eeab419ce7"
-  ],
-  "includePlatforms": [
-    "Android",
-    "Editor",
-    "iOS"
-  ],
-  "excludePlatforms": [],
-  "allowUnsafeCode": false,
-  "overrideReferences": true,
-  "precompiledReferences": [
-    "nunit.framework.dll"
-  ],
-  "autoReferenced": false,
-  "defineConstraints": [
-    "UNITY_INCLUDE_TESTS"
-  ],
-  "versionDefines": [],
-  "noEngineReferences": false
+    "name": "VisualTests",
+    "rootNamespace": "",
+    "references": [
+        "GUID:e555144732b726c4cba5b0f6337fea75",
+        "GUID:cc6bfabbfe87b7949aa248893f89ce37",
+        "GUID:760a1d365aad58044916992b072cf2a6",
+        "GUID:b1087c5731ff68448a0a9c625bb7e52d",
+        "GUID:ef84d7ce90ba34f07be26ace428e9bc8",
+        "GUID:27619889b8ba8c24980f49ee34dbb44a",
+        "GUID:0acc523941302664db1f4e527237feb3",
+        "GUID:a881b57670b1d2747a6d7f9e32b63230",
+        "GUID:a3ceb534947fac14da25035bc5c24788",
+        "GUID:3f13bd1a926f03a4cab988f06a80c1fd",
+        "GUID:6dacc6cde5056a34c9488c309ca0a18a",
+        "GUID:a78c5d8dad39efe45ab1b21901f8db0f",
+        "GUID:b308ae946900fa04080222d7daf47d9a",
+        "GUID:97d8897529779cb49bebd400c7f402a6",
+        "GUID:5289a39f46259954ca74010d7c9ded16",
+        "GUID:fbcc413e192ef9048811d47ab0aca0c0",
+        "GUID:3047fd2f05bcaae498a99a3f9321f9a8",
+        "GUID:edd6917fa0e214e44b6592eeab419ce7",
+        "GUID:15fc0a57446b3144c949da3e2b9737a9"
+    ],
+    "includePlatforms": [
+        "Android",
+        "Editor",
+        "iOS"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
 }

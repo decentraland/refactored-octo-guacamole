@@ -1,8 +1,11 @@
 using DCL.Configuration;
 using System.Collections;
 using System.IO;
+using System.Reflection;
 using UnityEngine;
 using UnityEngine.Assertions;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 
 namespace DCL.Helpers
 {
@@ -127,13 +130,22 @@ namespace DCL.Helpers
             // We should only read the screen buffer after rendering is complete
             yield return null;
 
-            RenderTexture renderTexture = new RenderTexture(width, height, 24);
+            RenderTexture renderTexture = new RenderTexture(width, height, 32, RenderTextureFormat.DefaultHDR, RenderTextureReadWrite.sRGB);
             camera.targetTexture = renderTexture;
             camera.Render();
 
             RenderTexture.active = renderTexture;
-            Texture2D currentSnapshot = new Texture2D(width, height, TextureFormat.RGB24, false);
+            Texture2D currentSnapshot = new Texture2D(width, height, TextureFormat.RGBAFloat, false);
             currentSnapshot.ReadPixels(new Rect(0, 0, width, height), 0, 0);
+
+            // Apply Gamma color space
+            var pixels = currentSnapshot.GetPixels();
+            for (int index = 0; index < pixels.Length; index++)
+            {
+                pixels[index] = new Color( Mathf.LinearToGammaSpace(pixels[index].r), Mathf.LinearToGammaSpace(pixels[index].g), Mathf.LinearToGammaSpace(pixels[index].b));
+            }
+            currentSnapshot.SetPixels(pixels);
+
             currentSnapshot.Apply();
 
             yield return null;
@@ -311,5 +323,32 @@ namespace DCL.Helpers
         }
 
         public static void RepositionVisualTestsCamera(Camera camera, Vector3? position = null, Vector3? target = null) { RepositionVisualTestsCamera(camera.transform, position, target); }
+
+        public static void SetSSAOActive(bool active)
+        {
+            var urpAsset = GraphicsSettings.renderPipelineAsset as UniversalRenderPipelineAsset;
+
+            ScriptableRenderer forwardRenderer = urpAsset.GetRenderer(0);
+            FieldInfo featuresField = typeof(ScriptableRenderer).GetField("m_RendererFeatures", BindingFlags.NonPublic | BindingFlags.Instance);
+
+            IList features = featuresField.GetValue(forwardRenderer) as IList;
+            ScriptableRendererFeature ssaoFeature = features[0] as ScriptableRendererFeature;
+
+            if (!active)
+            {
+                ssaoFeature.SetActive(false);
+                return;
+            }
+
+            FieldInfo settingsField = ssaoFeature.GetType().GetField("m_Settings", BindingFlags.NonPublic | BindingFlags.Instance);
+            object settings = settingsField.GetValue(ssaoFeature);
+
+            FieldInfo sourceField = settings.GetType().GetField("Source", BindingFlags.NonPublic | BindingFlags.Instance);
+            FieldInfo downsampleField = settings.GetType().GetField("Downsample", BindingFlags.NonPublic | BindingFlags.Instance);
+
+            ssaoFeature.SetActive(true);
+            sourceField.SetValue(settings, 1);
+            downsampleField.SetValue(settings, false);
+        }
     }
 }

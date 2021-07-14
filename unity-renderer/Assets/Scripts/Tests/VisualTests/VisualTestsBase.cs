@@ -8,7 +8,11 @@ public class VisualTestsBase : IntegrationTestSuite_Legacy
     protected override string TEST_SCENE_NAME => "MainVisualTest";
     protected override bool enableSceneIntegrityChecker => false;
 
-    protected override IEnumerator SetUp() { yield break; }
+    protected override IEnumerator SetUp()
+    {
+        VisualTestHelpers.SetSSAOActive(false);
+        yield break;
+    }
 
     public IEnumerator InitVisualTestsScene(string testName)
     {
