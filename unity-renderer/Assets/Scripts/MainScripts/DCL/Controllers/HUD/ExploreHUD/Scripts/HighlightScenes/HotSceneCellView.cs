@@ -1,8 +1,12 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using DCL.Helpers;
 using UnityEngine;
 using TMPro;
+using System.Linq;
+using DCL;
+using static DCL.Interface.WebInterface;
+using DCL.Interface;
 
 internal class HotSceneCellView : MonoBehaviour
 {
@@ -52,6 +56,8 @@ internal class HotSceneCellView : MonoBehaviour
     private Dictionary<string, ExploreFriendsView> friendViewById;
     private bool isLoaded = false;
     private bool isInitialized = false;
+    private Queue<HotScenesController.HotSceneInfo.Realm> nextMostPopulatedRealms = new Queue<HotScenesController.HotSceneInfo.Realm>();
+    private JumpInPayload lastJumpInTried = new JumpInPayload();
 
     HotScenesController.HotSceneInfo hotSceneInfo;
 
@@ -117,16 +123,64 @@ internal class HotSceneCellView : MonoBehaviour
     public void JumpInPressed()
     {
         HotScenesController.HotSceneInfo.Realm realm = new HotScenesController.HotSceneInfo.Realm() { layer = null, serverName = null };
+        hotSceneInfo.realms = hotSceneInfo.realms.OrderByDescending(x => x.usersCount).ToArray();
+        nextMostPopulatedRealms.Clear();
         for (int i = 0; i < hotSceneInfo.realms.Length; i++)
         {
             if (hotSceneInfo.realms[i].usersCount < hotSceneInfo.realms[i].usersMax)
             {
                 realm = hotSceneInfo.realms[i];
+                if (i < hotSceneInfo.realms.Length - 1)
+                {
+                    nextMostPopulatedRealms = new Queue<HotScenesController.HotSceneInfo.Realm>(hotSceneInfo.realms.ToList().GetRange(i + 1, hotSceneInfo.realms.Length - i - 1));
+                }
                 break;
             }
         }
 
+        RealmsInfoBridge.OnRealmConnectionSuccess -= OnRealmConnectionSuccess;
+        RealmsInfoBridge.OnRealmConnectionSuccess += OnRealmConnectionSuccess;
+        RealmsInfoBridge.OnRealmConnectionFailed -= OnRealmConnectionFailed;
+        RealmsInfoBridge.OnRealmConnectionFailed += OnRealmConnectionFailed;
+
+        lastJumpInTried.gridPosition = hotSceneInfo.baseCoords;
+        lastJumpInTried.realm.serverName = realm.serverName;
+        lastJumpInTried.realm.layer = realm.layer;
+
         OnJumpIn?.Invoke(hotSceneInfo.baseCoords, realm.serverName, realm.layer);
+    }
+
+    private void OnRealmConnectionSuccess(JumpInPayload successRealm)
+    {
+        if (successRealm.gridPosition != lastJumpInTried.gridPosition ||
+            successRealm.realm.serverName != lastJumpInTried.realm.serverName ||
+            successRealm.realm.layer != lastJumpInTried.realm.layer)
+            return;
+
+        RealmsInfoBridge.OnRealmConnectionSuccess -= OnRealmConnectionSuccess;
+        RealmsInfoBridge.OnRealmConnectionFailed -= OnRealmConnectionFailed;
+    }
+
+    private void OnRealmConnectionFailed(JumpInPayload failedRealm)
+    {
+        if (failedRealm.gridPosition != lastJumpInTried.gridPosition ||
+            failedRealm.realm.serverName != lastJumpInTried.realm.serverName ||
+            failedRealm.realm.layer != lastJumpInTried.realm.layer)
+            return;
+
+        if (nextMostPopulatedRealms.Count > 0)
+        {
+            WebInterface.NotifyStatusThroughChat("Trying to connect to the next more populated realm...");
+            HotScenesController.HotSceneInfo.Realm nextRealmToTry = nextMostPopulatedRealms.Dequeue();
+            OnJumpIn?.Invoke(hotSceneInfo.baseCoords, nextRealmToTry.serverName, nextRealmToTry.layer);
+        }
+        else
+        {
+            WebInterface.NotifyStatusThroughChat("You'll stay in your current realm.");
+            RealmsInfoBridge.OnRealmConnectionSuccess -= OnRealmConnectionSuccess;
+            RealmsInfoBridge.OnRealmConnectionFailed -= OnRealmConnectionFailed;
+            OnJumpIn?.Invoke(hotSceneInfo.baseCoords, null, null);
+        }
     }
 
     private void OnDestroy()
@@ -136,6 +190,9 @@ internal class HotSceneCellView : MonoBehaviour
 
         friendsHandler.onFriendAdded -= OnFriendAdded;
         friendsHandler.onFriendRemoved -= OnFriendRemoved;
+
+        RealmsInfoBridge.OnRealmConnectionFailed -= OnRealmConnectionFailed;
+        RealmsInfoBridge.OnRealmConnectionSuccess -= OnRealmConnectionSuccess;
     }
 
     private void OnEnable()

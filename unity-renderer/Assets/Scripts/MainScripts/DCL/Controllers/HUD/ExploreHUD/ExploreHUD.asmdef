@@ -1,5 +1,6 @@
 {
     "name": "ExploreHUD",
+    "rootNamespace": "",
     "references": [
         "GUID:555c1f3c6d18648df910b7a1de75b424",
         "GUID:6055be8ebefd69e48b49212b09b47b2f",
@@ -14,7 +15,8 @@
         "GUID:99cea83ca76dcd846abed7e61a8c90bd",
         "GUID:bb3eef89092f71f44aa2449a9cf7879c",
         "GUID:a3ceb534947fac14da25035bc5c24788",
-        "GUID:d7f1765642f0c22cda30addd0275b5e1"
+        "GUID:d7f1765642f0c22cda30addd0275b5e1",
+        "GUID:57a7040eaf02d4eadaa266755f23857a"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

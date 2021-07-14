@@ -2,13 +2,14 @@
     "name": "WebInterface",
     "rootNamespace": "",
     "references": [
-      "GUID:43315b150e1df4592868fc0fe58b3429",
-      "GUID:6afcac5154f98e846bbd9f27e454b57a",
-      "GUID:ba9b721ce33233c4da7ff4ef30d25b59",
-      "GUID:a881b57670b1d2747a6d7f9e32b63230",
-      "GUID:b1087c5731ff68448a0a9c625bb7e52d",
-      "GUID:4720e174f2805c74bb7aa94cc8bb5bf8",
-      "GUID:97d8897529779cb49bebd400c7f402a6"
+        "GUID:43315b150e1df4592868fc0fe58b3429",
+        "GUID:6afcac5154f98e846bbd9f27e454b57a",
+        "GUID:ba9b721ce33233c4da7ff4ef30d25b59",
+        "GUID:a881b57670b1d2747a6d7f9e32b63230",
+        "GUID:b1087c5731ff68448a0a9c625bb7e52d",
+        "GUID:4720e174f2805c74bb7aa94cc8bb5bf8",
+        "GUID:97d8897529779cb49bebd400c7f402a6",
+        "GUID:b8662e798190944f4b638fbeb48e84f0"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
