@@ -152,6 +152,13 @@ namespace DCL
                 UnityEngine.Object.Destroy(mesh);
             }
 
+            if (mats.Count == 0)
+            {
+                UnityEngine.Object.Destroy(finalMesh);
+                UnityEngine.Object.Destroy(result);
+                return null;
+            }
+
             var poses = bindPosesContainer.sharedMesh.bindposes;
 
             List<Matrix4x4> newPoses = new List<Matrix4x4>();
@@ -179,7 +186,7 @@ namespace DCL
             newSkinnedMeshRenderer.sharedMaterial = mats[0];
             newSkinnedMeshRenderer.quality = SkinQuality.Bone1;
             newSkinnedMeshRenderer.updateWhenOffscreen = false;
-
+            newSkinnedMeshRenderer.skinnedMotionVectors = false;
             //result.AddComponent<MeshFilter>().sharedMesh = finalMesh;
             //result.AddComponent<MeshRenderer>().sharedMaterials = newSkinnedMeshRenderer.sharedMaterials;
 

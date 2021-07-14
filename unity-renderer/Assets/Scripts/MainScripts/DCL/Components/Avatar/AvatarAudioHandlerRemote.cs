@@ -52,6 +52,8 @@ public class AvatarAudioHandlerRemote : MonoBehaviour
 
     public void Init(GameObject rendererContainer) { this.rendererContainer = rendererContainer; }
 
+    private bool avatarIsVisible = false;
+
     private void Update()
     {
         if (blackBoard == null || !globalRendererIsReady)
@@ -71,36 +73,46 @@ public class AvatarAudioHandlerRemote : MonoBehaviour
                 footstepLand.Play(true);
         }
 
+        isGroundedPrevious = blackBoard.isGrounded;
+
+        if (rendererContainer == null)
+        {
+            SimulateFootsteps();
+            return;
+        }
+
+        if (rendererContainer != null && renderer == null)
+        {
+            //NOTE(Mordi): The renderer takes a while to get ready, so we need to check it continually until it can be fetched
+            renderer = rendererContainer.GetComponent<Renderer>();
+
+            if ( renderer == null )
+                return;
+        }
+
         // Simulate footsteps when avatar is not visible
-        if (renderer != null)
+        if (!AvatarIsInView())
         {
             SimulateFootsteps();
         }
-        else
-        {
-            if (rendererContainer != null)
-            {
-                //NOTE(Mordi): The renderer takes a while to get ready, so we need to check it continually until it can be fetched
-                renderer = rendererContainer.GetComponent<Renderer>();
-            }
-        }
-
-        isGroundedPrevious = blackBoard.isGrounded;
     }
 
     bool AvatarIsInView()
     {
-        if (renderer.isVisible)
+        if (avatarIsVisible || renderer.isVisible)
+        {
+            avatarIsVisible = true;
             return true;
+        }
 
-        if (Camera.main == null)
+        if ( mainCamera == null )
+            mainCamera = Camera.main;
+
+        if (mainCamera == null)
             return false;
 
         // NOTE(Mordi): In some cases, the renderer will report false even if the avatar is visible.
         // Therefore we must check whether or not the avatar is in the camera's view.
-
-        if ( mainCamera == null )
-            mainCamera = Camera.main;
 
         if (mainCamera == null)
             return false;
@@ -118,12 +130,13 @@ public class AvatarAudioHandlerRemote : MonoBehaviour
             }
         }
 
+        avatarIsVisible = false;
         return false;
     }
 
     void SimulateFootsteps()
     {
-        if (!AvatarIsInView() && (blackBoard.movementSpeed / Time.deltaTime) > 1f && blackBoard.isGrounded)
+        if ((blackBoard.movementSpeed / Time.deltaTime) > 1f && blackBoard.isGrounded)
         {
             if (Time.time >= nextFootstepTime)
             {
