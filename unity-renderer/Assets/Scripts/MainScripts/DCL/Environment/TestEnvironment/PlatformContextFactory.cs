@@ -18,6 +18,7 @@ namespace DCL.Tests
             IWebRequestController webRequest = Substitute.For<IWebRequestController>();
             IServiceProviders serviceProviders = Substitute.For<IServiceProviders>();
             IIdleChecker idleChecker = Substitute.For<IIdleChecker>();
+            IAvatarsLODController avatarsLODController = Substitute.For<IAvatarsLODController>();
 
             foreach ( var mock in mocks)
             {
@@ -50,6 +51,9 @@ namespace DCL.Tests
                     case IIdleChecker idl:
                         idleChecker = idl;
                         break;
+                    case IAvatarsLODController alodc:
+                        avatarsLODController = alodc;
+                        break;
                 }
             }
 
@@ -61,7 +65,8 @@ namespace DCL.Tests
                 debugController,
                 webRequest,
                 serviceProviders,
-                idleChecker);
+                idleChecker,
+                avatarsLODController);
         }
 
         public static PlatformContext CreateWithCustomMocks(
@@ -73,7 +78,8 @@ namespace DCL.Tests
             IDebugController debugController = null,
             IWebRequestController webRequestController = null,
             IServiceProviders serviceProviders = null,
-            IIdleChecker idleChecker = null)
+            IIdleChecker idleChecker = null,
+            IAvatarsLODController avatarsLODController = null)
         {
             return new PlatformContext(
                 memoryManager: memoryManager ?? Substitute.For<IMemoryManager>(),
@@ -84,7 +90,8 @@ namespace DCL.Tests
                 debugController: debugController ?? Substitute.For<IDebugController>(),
                 webRequest: webRequestController ?? GetWebRequestControllerMock(),
                 serviceProviders: serviceProviders ?? GetServiceProvidersMock(),
-                idleChecker: idleChecker ?? Substitute.For<IIdleChecker>());
+                idleChecker: idleChecker ?? Substitute.For<IIdleChecker>(),
+                avatarsLODController: avatarsLODController ?? Substitute.For<IAvatarsLODController>());
         }
 
         private static IWebRequestController GetWebRequestControllerMock()

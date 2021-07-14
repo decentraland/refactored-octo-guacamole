@@ -113,6 +113,8 @@ namespace DCL
                 sfxVolume = 1,
                 mouseSensitivity = 0.6f,
                 scenesLoadRadius = 4,
+                avatarsLODDistance = 16,
+                maxNonLODAvatars = 20,
                 voiceChatVolume = 1,
                 voiceChatAllow = SettingsData.GeneralSettings.VoiceChatAllow.ALL_USERS,
                 autoqualityOn = false
@@ -179,12 +181,16 @@ namespace DCL.SettingsData
         public VoiceChatAllow voiceChatAllow;
         public bool autoqualityOn;
         public float scenesLoadRadius;
+        public float avatarsLODDistance;
+        public float maxNonLODAvatars;
 
         public bool Equals(GeneralSettings settings)
         {
             return sfxVolume == settings.sfxVolume
                    && mouseSensitivity == settings.mouseSensitivity
                    && scenesLoadRadius == settings.scenesLoadRadius
+                   && avatarsLODDistance == settings.avatarsLODDistance
+                   && maxNonLODAvatars == settings.maxNonLODAvatars
                    && voiceChatVolume == settings.voiceChatVolume
                    && voiceChatAllow == settings.voiceChatAllow
                    && autoqualityOn == settings.autoqualityOn;

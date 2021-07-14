@@ -6,6 +6,7 @@ namespace KernelConfigurationTypes
     public class Features
     {
         public bool enableBuilderInWorld = false;
+        public bool enableAvatarLODs = false;
 
         public bool Equals(Features other) { return enableBuilderInWorld == other?.enableBuilderInWorld; }
 

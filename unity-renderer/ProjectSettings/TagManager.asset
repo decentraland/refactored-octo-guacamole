@@ -31,8 +31,7 @@ TagManager:
   - PlayerInfoCardMenu
   - AvatarTriggerDetection
   - Tutorial
-  - 
-  - 
+  - ViewportCullingIgnored
   - 
   - 
   - 

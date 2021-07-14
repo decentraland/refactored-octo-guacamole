@@ -418,6 +418,16 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5253129788489465426, guid: 0efeabe527e0949d9aaa69eb2ea4d149,
+        type: 3}
+      propertyPath: m_textAlignment
+      value: 65535
+      objectReference: {fileID: 0}
+    - target: {fileID: 5253129788489465426, guid: 0efeabe527e0949d9aaa69eb2ea4d149,
+        type: 3}
+      propertyPath: m_VerticalAlignment
+      value: 512
+      objectReference: {fileID: 0}
     - target: {fileID: 6724603896333122190, guid: 0efeabe527e0949d9aaa69eb2ea4d149,
         type: 3}
       propertyPath: m_Name

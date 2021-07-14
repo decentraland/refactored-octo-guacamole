@@ -1,29 +1,32 @@
 {
-  "name": "SettingsControllers",
-  "rootNamespace": "",
-  "references": [
-    "GUID:4307f53044263cf4b835bd812fc161a4",
-    "GUID:15fc0a57446b3144c949da3e2b9737a9",
-    "GUID:301149363e31a4bdaa1943465a825c8e",
-    "GUID:b1087c5731ff68448a0a9c625bb7e52d",
-    "GUID:df380645f10b7bc4b97d4f5eb6303d95",
-    "GUID:4973650d2444c4561a15d50f24d91cd9",
-    "GUID:4720e174f2805c74bb7aa94cc8bb5bf8",
-    "GUID:e945202cffc30cc479229aef4577a74c",
-    "GUID:e555144732b726c4cba5b0f6337fea75",
-    "GUID:e5e0eb4db75e1fb428f720319518e32c",
-    "GUID:b97702e026e0dbd4397dc4013ef9fcb3",
-    "GUID:fbcc413e192ef9048811d47ab0aca0c0"
-  ],
-  "includePlatforms": [],
-  "excludePlatforms": [],
-  "allowUnsafeCode": true,
-  "overrideReferences": false,
-  "precompiledReferences": [
-    ""
-  ],
-  "autoReferenced": true,
-  "defineConstraints": [],
-  "versionDefines": [],
+    "name": "SettingsControllers",
+    "rootNamespace": "",
+    "references": [
+        "GUID:4307f53044263cf4b835bd812fc161a4",
+        "GUID:15fc0a57446b3144c949da3e2b9737a9",
+        "GUID:301149363e31a4bdaa1943465a825c8e",
+        "GUID:b1087c5731ff68448a0a9c625bb7e52d",
+        "GUID:df380645f10b7bc4b97d4f5eb6303d95",
+        "GUID:4973650d2444c4561a15d50f24d91cd9",
+        "GUID:4720e174f2805c74bb7aa94cc8bb5bf8",
+        "GUID:e945202cffc30cc479229aef4577a74c",
+        "GUID:e555144732b726c4cba5b0f6337fea75",
+        "GUID:e5e0eb4db75e1fb428f720319518e32c",
+        "GUID:b97702e026e0dbd4397dc4013ef9fcb3",
+        "GUID:fbcc413e192ef9048811d47ab0aca0c0",
+        "GUID:c44f6fd10d3d94432a107d581e0096b5",
+        "GUID:28f74c468a54948bfa9f625c5d428f56",
+        "GUID:e99faafecbf8dd74d8130597511b9b27"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": false,
+    "precompiledReferences": [
+        ""
+    ],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
     "noEngineReferences": false
 }

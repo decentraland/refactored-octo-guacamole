@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 060c1aa63ccfe124aa3cd640f9286a0b, type: 3}
+  m_Name: AvatarsLODDistanceControlConfiguration
+  m_EditorClassIdentifier: 
+  title: AVATARS LOD DISTANCE
+  controlPrefab: {fileID: 3572563192424337713, guid: 9c69fdd3db1d73140bfff48c5a2f72dd,
+    type: 3}
+  controlController: {fileID: 11400000, guid: ea88adfa7c8674547b4680b637668aeb, type: 2}
+  flagsThatDisableMe: []
+  flagsThatDeactivateMe:
+  - {fileID: 11400000, guid: 5932aa2a572cf43a189edf2072b323d6, type: 2}
+  isBeta: 0
+  sliderMinValue: 5
+  sliderMaxValue: 48
+  storeValueAsNormalized: 0
+  wholeNumbers: 0

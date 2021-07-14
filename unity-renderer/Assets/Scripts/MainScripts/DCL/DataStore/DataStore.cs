@@ -27,6 +27,7 @@ namespace DCL
         public readonly BaseVariable<AppMode> appMode = new BaseVariable<AppMode>();
         public readonly DataStore_Player player = new DataStore_Player();
         public readonly BaseVariable<NFTPromptModel> onOpenNFTPrompt = new BaseVariable<NFTPromptModel>();
+        public readonly DataStore_AvatarsLOD avatarsLOD = new DataStore_AvatarsLOD();
 
         public class BuilderInWorld
         {
@@ -63,6 +64,13 @@ namespace DCL
         {
             // NOTE: set when character is teleported (DCLCharacterController - Teleport)
             public readonly BaseVariable<Vector3> lastTeleportPosition = new BaseVariable<Vector3>(Vector3.zero);
+        }
+
+        public class DataStore_AvatarsLOD
+        {
+            public readonly BaseVariable<bool> LODEnabled = new BaseVariable<bool>(false); // false because of feature flag...
+            public readonly BaseVariable<float> LODDistance = new BaseVariable<float>(16f);
+            public readonly BaseVariable<int> maxNonLODAvatars = new BaseVariable<int>(20);
         }
     }
 }

@@ -1,0 +1,16 @@
+{
+    "name": "AvatarsLODControllerInterface",
+    "rootNamespace": "",
+    "references": [
+        "GUID:46cbc133d57a24117993396eb0fbbc5a"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

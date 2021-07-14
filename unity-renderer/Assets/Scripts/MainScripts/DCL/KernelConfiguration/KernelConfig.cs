@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using DCL;
 using UnityEngine;
 using DCL.Helpers;
 
@@ -91,6 +92,7 @@ public class KernelConfig
             initializationPromises.Clear();
             initializationPromises = null;
         }
+
         initialized = true;
     }
 

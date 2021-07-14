@@ -16,7 +16,8 @@ namespace DCL
                 debugController: new DebugController(new BotsController()),
                 webRequest: WebRequestController.Create(),
                 serviceProviders: new ServiceProviders(),
-                idleChecker: new IdleChecker());
+                idleChecker: new IdleChecker(),
+                avatarsLODController: new AvatarsLODController());
         }
     }
 }

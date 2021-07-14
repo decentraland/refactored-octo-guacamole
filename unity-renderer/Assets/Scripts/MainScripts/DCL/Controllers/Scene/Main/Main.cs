@@ -65,29 +65,17 @@ namespace DCL
                 messagingBuilder: MessagingContextBuilder,
                 platformBuilder: PlatformContextBuilder,
                 worldRuntimeBuilder: WorldRuntimeContextBuilder,
-                hudBuilder: HUDContextBuilder);    
+                hudBuilder: HUDContextBuilder);
         }
-        protected virtual MessagingContext MessagingContextBuilder()
-        {
-            return MessagingContextFactory.CreateDefault();
-        }
-        protected virtual PlatformContext PlatformContextBuilder()
-        {
-            return PlatformContextFactory.CreateDefault();
-        }
-        protected virtual WorldRuntimeContext WorldRuntimeContextBuilder()
-        {
-            return WorldRuntimeContextFactory.CreateDefault(componentFactory);
-        }
-        protected virtual HUDContext HUDContextBuilder()
-        {
-            return HUDContextFactory.CreateDefault();
-        }
+        protected virtual MessagingContext MessagingContextBuilder() { return MessagingContextFactory.CreateDefault(); }
+        protected virtual PlatformContext PlatformContextBuilder() { return PlatformContextFactory.CreateDefault(); }
+        protected virtual WorldRuntimeContext WorldRuntimeContextBuilder() { return WorldRuntimeContextFactory.CreateDefault(componentFactory); }
+        protected virtual HUDContext HUDContextBuilder() { return HUDContextFactory.CreateDefault(); }
         private void Start() { Environment.i.world.sceneController.Start(); }
 
         private void Update()
         {
-            Environment.i.platform.idleChecker.Update();
+            Environment.i.platform.Update();
             Environment.i.world.sceneController.Update();
             performanceMetricsController?.Update();
         }

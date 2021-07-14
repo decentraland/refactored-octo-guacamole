@@ -17,7 +17,7 @@ namespace DCL
         public readonly IWebRequestController webRequest;
         public readonly IServiceProviders serviceProviders;
         public readonly IIdleChecker idleChecker;
-
+        public readonly IAvatarsLODController avatarsLODController;
 
         public PlatformContext(IMemoryManager memoryManager,
             ICullingController cullingController,
@@ -27,7 +27,8 @@ namespace DCL
             IDebugController debugController,
             IWebRequestController webRequest,
             IServiceProviders serviceProviders,
-            IIdleChecker idleChecker)
+            IIdleChecker idleChecker,
+            IAvatarsLODController avatarsLODController)
         {
             this.memoryManager = memoryManager;
             this.cullingController = cullingController;
@@ -38,6 +39,13 @@ namespace DCL
             this.webRequest = webRequest;
             this.serviceProviders = serviceProviders;
             this.idleChecker = idleChecker;
+            this.avatarsLODController = avatarsLODController;
+        }
+
+        public void Update()
+        {
+            idleChecker.Update();
+            avatarsLODController.Update();
         }
 
         public void Dispose()
@@ -48,6 +56,7 @@ namespace DCL
             debugController.Dispose();
             webRequest.Dispose();
             serviceProviders.Dispose();
+            avatarsLODController.Dispose();
         }
     }
 }
