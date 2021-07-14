@@ -11,7 +11,6 @@
         "y": 100
       }
     ],
-    "baseUrl": "http://localhost:9991/local-ipfs/contents/",
     "contents": [
       {
         "file": "game.js",
@@ -44,7 +43,6 @@
         "y": 100
       }
     ],
-    "baseUrl": "http://localhost:9991/local-ipfs/contents/",
     "contents": [
       {
         "file": "game.js",
@@ -77,7 +75,6 @@
         "y": 101
       }
     ],
-    "baseUrl": "http://localhost:9991/local-ipfs/contents/",
     "contents": [
       {
         "file": "game.js",
@@ -110,7 +107,6 @@
         "y": 102
       }
     ],
-    "baseUrl": "http://localhost:9991/local-ipfs/contents/",
     "contents": [
       {
         "file": "game.js",
@@ -143,7 +139,6 @@
         "y": 103
       }
     ],
-    "baseUrl": "http://localhost:9991/local-ipfs/contents/",
     "contents": [
       {
         "file": "game.js",
@@ -176,7 +171,6 @@
         "y": 104
       }
     ],
-    "baseUrl": "http://localhost:9991/local-ipfs/contents/",
     "contents": [
       {
         "file": "game.js",
@@ -209,7 +203,6 @@
         "y": 105
       }
     ],
-    "baseUrl": "http://localhost:9991/local-ipfs/contents/",
     "contents": [
       {
         "file": "atlas.png",
@@ -246,7 +239,6 @@
         "y": 106
       }
     ],
-    "baseUrl": "http://localhost:9991/local-ipfs/contents/",
     "contents": [
       {
         "file": "game.js",
@@ -279,7 +271,6 @@
         "y": 107
       }
     ],
-    "baseUrl": "http://localhost:9991/local-ipfs/contents/",
     "contents": [
       {
         "file": "game.js",
@@ -312,7 +303,6 @@
         "y": 108
       }
     ],
-    "baseUrl": "http://localhost:9991/local-ipfs/contents/",
     "contents": [
       {
         "file": "game.js",
@@ -345,7 +335,6 @@
         "y": 109
       }
     ],
-    "baseUrl": "http://localhost:9991/local-ipfs/contents/",
     "contents": [
       {
         "file": "bubble.png",

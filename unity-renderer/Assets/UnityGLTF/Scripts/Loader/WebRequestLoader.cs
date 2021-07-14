@@ -15,19 +15,18 @@ namespace UnityGLTF.Loader
     {
         public Stream LoadedStream { get; private set; }
         public bool HasSyncLoadMethod { get; private set; }
-
-        public delegate void WebRequestLoaderEventAction(ref string requestFileName);
-        public event WebRequestLoaderEventAction OnLoadStreamStart;
+        public AssetIdConverter assetIdConverter { get; private set; }
 
         string _rootURI;
         bool VERBOSE = false;
         IWebRequestController webRequestController;
 
-        public WebRequestLoader(string rootURI, IWebRequestController webRequestController)
+        public WebRequestLoader(string rootURI, IWebRequestController webRequestController, AssetIdConverter fileToHashConverter = null)
         {
             _rootURI = rootURI;
             HasSyncLoadMethod = false;
             this.webRequestController = webRequestController;
+            assetIdConverter = fileToHashConverter;
         }
 
         public IEnumerator LoadStream(string filePath)
@@ -49,7 +48,13 @@ namespace UnityGLTF.Loader
 
         public string GetWrappedUri(string uri)
         {
-            OnLoadStreamStart?.Invoke(ref uri);
+            if (assetIdConverter != null)
+            {
+                if (assetIdConverter(uri, out string result))
+                {
+                    return result;
+                }
+            }
             return uri;
         }
 

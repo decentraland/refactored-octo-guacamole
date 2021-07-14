@@ -13,6 +13,7 @@ namespace UnityGLTF.Loader
         public Stream LoadedStream { get; private set; }
 
         public bool HasSyncLoadMethod { get; private set; }
+        public AssetIdConverter assetIdConverter => null;
 
         public FileLoader(string rootDirectoryPath)
         {

@@ -9,7 +9,7 @@ namespace DCL
         protected string assetDirectoryPath;
 
         protected ContentProvider provider = null;
-        public string url { get; private set; }
+        public string fileName { get; private set; }
 
         GLTFComponent gltfComponent = null;
         object id = null;
@@ -17,7 +17,7 @@ namespace DCL
         public AssetPromise_GLTF(ContentProvider provider, string url, string hash = null)
         {
             this.provider = provider;
-            this.url = url.Substring(url.LastIndexOf('/') + 1);
+            this.fileName = url.Substring(url.LastIndexOf('/') + 1);
             this.id = hash ?? url;
             // We separate the directory path of the GLB and its file name, to be able to use the directory path when 
             // fetching relative assets like textures in the ParseGLTFWebRequestedFile() event call
@@ -46,19 +46,24 @@ namespace DCL
                 useVisualFeedback = settings.visibleFlags == AssetPromiseSettings_Rendering.VisibleFlags.VISIBLE_WITH_TRANSITION,
                 initialVisibility = settings.visibleFlags != AssetPromiseSettings_Rendering.VisibleFlags.INVISIBLE,
                 shaderOverride = settings.shaderOverride,
-                addMaterialsToPersistentCaching = (settings.cachingFlags & MaterialCachingHelper.Mode.CACHE_MATERIALS) != 0
+                addMaterialsToPersistentCaching = (settings.cachingFlags & MaterialCachingHelper.Mode.CACHE_MATERIALS) != 0,
             };
 
-            tmpSettings.OnWebRequestStartEvent += ParseGLTFWebRequestedFile;
-
-            gltfComponent.LoadAsset(url, GetId() as string, false, tmpSettings);
+            gltfComponent.LoadAsset(provider.baseUrl ?? assetDirectoryPath, fileName, GetId() as string, false, tmpSettings, FileToHash);
             gltfComponent.OnSuccess += OnSuccess;
             gltfComponent.OnFail += OnFail;
 
-            asset.name = url;
+            asset.name = fileName;
         }
 
-        void ParseGLTFWebRequestedFile(ref string requestedFileName) { provider.TryGetContentsUrl(assetDirectoryPath + requestedFileName, out requestedFileName); }
+        bool FileToHash(string fileName, out string hash)
+        {
+            if (provider.TryGetContentHash(assetDirectoryPath + fileName, out hash))
+            {
+                return true;
+            }
+            return false;
+        }
 
         protected override void OnReuse(System.Action OnSuccess)
         {

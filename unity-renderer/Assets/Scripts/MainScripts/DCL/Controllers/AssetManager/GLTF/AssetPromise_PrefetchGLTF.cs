@@ -4,7 +4,7 @@ namespace DCL
     {
         public AssetPromise_PrefetchGLTF(ContentProvider provider, string url, string hash) : base(provider, url, hash) { settings.visibleFlags = AssetPromiseSettings_Rendering.VisibleFlags.INVISIBLE; }
 
-        protected override void OnBeforeLoadOrReuse() { asset.container.name = "GLTF: " + url; }
+        protected override void OnBeforeLoadOrReuse() { asset.container.name = "GLTF: " + fileName; }
 
         public override object GetId() { return base.GetId(); }
 

@@ -30,7 +30,6 @@ namespace UnityGLTF
             public bool? initialVisibility;
             public Shader shaderOverride;
             public bool addMaterialsToPersistentCaching;
-            public WebRequestLoader.WebRequestLoaderEventAction OnWebRequestStartEvent;
         }
 
         public string GLTFUri = null;
@@ -72,6 +71,7 @@ namespace UnityGLTF
         [SerializeField] private float RetryTimeout = 2.0f;
         [SerializeField] public Shader shaderOverride = null;
         private bool initialVisibility = true;
+        private AssetIdConverter fileToHashConverter;
 
         private enum State
         {
@@ -90,8 +90,7 @@ namespace UnityGLTF
         private GLTFSceneImporter sceneImporter;
         private Camera mainCamera;
         private DCL.IWebRequestController webRequestController;
-
-        public WebRequestLoader.WebRequestLoaderEventAction OnWebRequestStartEvent;
+        private string baseUrl = "";
 
         public Action OnSuccess { get { return OnFinishedLoadingAsset; } set { OnFinishedLoadingAsset = value; } }
 
@@ -99,7 +98,7 @@ namespace UnityGLTF
 
         public void Initialize(DCL.IWebRequestController webRequestController) { this.webRequestController = webRequestController; }
 
-        public void LoadAsset(string incomingURI = "", string idPrefix = "", bool loadEvenIfAlreadyLoaded = false, Settings settings = null)
+        public void LoadAsset(string baseUrl, string incomingURI = "", string idPrefix = "", bool loadEvenIfAlreadyLoaded = false, Settings settings = null, AssetIdConverter fileToHashConverter = null)
         {
             if (alreadyLoadedAsset && !loadEvenIfAlreadyLoaded)
             {
@@ -120,11 +119,14 @@ namespace UnityGLTF
             alreadyDecrementedRefCount = false;
             state = State.NONE;
             mainCamera = Camera.main;
+            this.baseUrl = baseUrl ?? "";
 
             if (settings != null)
             {
                 ApplySettings(settings);
             }
+
+            this.fileToHashConverter = fileToHashConverter;
 
             loadingRoutine = DCL.CoroutineHelpers.StartThrowingCoroutine(this, LoadAssetCoroutine(), OnFail_Internal);
         }
@@ -144,11 +146,6 @@ namespace UnityGLTF
             if (settings.shaderOverride != null)
             {
                 this.shaderOverride = settings.shaderOverride;
-            }
-
-            if (settings.OnWebRequestStartEvent != null)
-            {
-                OnWebRequestStartEvent = settings.OnWebRequestStartEvent;
             }
 
             this.addMaterialsToPersistentCaching = settings.addMaterialsToPersistentCaching;
@@ -240,12 +237,9 @@ namespace UnityGLTF
                     }
                     else
                     {
-                        loader = new WebRequestLoader("", webRequestController);
+                        loader = new WebRequestLoader(baseUrl, webRequestController, fileToHashConverter);
 
                         string id = string.IsNullOrEmpty(idPrefix) ? GLTFUri : idPrefix;
-
-                        if (OnWebRequestStartEvent != null)
-                            (loader as WebRequestLoader).OnLoadStreamStart += OnWebRequestStartEvent;
 
                         sceneImporter = new GLTFSceneImporter(
                             id,
@@ -323,12 +317,6 @@ namespace UnityGLTF
 
                             sceneImporter?.Dispose();
                             sceneImporter = null;
-                        }
-
-                        if (OnWebRequestStartEvent != null)
-                        {
-                            (loader as WebRequestLoader).OnLoadStreamStart -= OnWebRequestStartEvent;
-                            OnWebRequestStartEvent = null;
                         }
 
                         loader = null;

@@ -117,11 +117,7 @@ namespace UnityGLTF
 
         public bool importSkeleton = true;
 
-        public bool useMaterialTransition
-        {
-            get => useMaterialTransitionValue && !renderingIsDisabled;
-            set => useMaterialTransitionValue = value;
-        }
+        public bool useMaterialTransition { get => useMaterialTransitionValue && !renderingIsDisabled; set => useMaterialTransitionValue = value; }
 
         public int maxTextureSize = 1024;
         private const float SAME_KEYFRAME_TIME_DELTA = 0.0001f;
@@ -499,6 +495,7 @@ namespace UnityGLTF
         {
             int sourceId = GetTextureSourceId(texture);
             GLTFImage image = _gltfRoot.Images[sourceId];
+            string imageId = GenerateImageId(image.Uri, sourceId);
 
             if (image.Uri != null && this.addImagesToPersistentCaching)
             {
@@ -508,7 +505,7 @@ namespace UnityGLTF
                 }
             }
 
-            if ((image.Uri == null || !PersistentAssetCache.HasImage(image.Uri, id)) && _assetCache.ImageStreamCache[sourceId] == null)
+            if ((image.Uri == null || !PersistentAssetCache.HasImage(imageId)) && _assetCache.ImageStreamCache[sourceId] == null)
             {
                 // we only load the streams if not a base64 uri, meaning the data is in the uri
                 if (image.Uri != null && !URIHelper.IsBase64Uri(image.Uri))
@@ -713,7 +710,7 @@ namespace UnityGLTF
                         yield return YieldOnTimeout();
                     }
 
-                    yield return ConstructUnityTexture(data, markGpuOnly, linear, image, imageCacheIndex);
+                    yield return ConstructUnityTexture(data, markGpuOnly, linear, imageCacheIndex);
                 }
                 else
                 {
@@ -740,7 +737,7 @@ namespace UnityGLTF
             }
         }
 
-        protected virtual IEnumerator ConstructUnityTexture(byte[] buffer, bool markGpuOnly, bool linear, GLTFImage image, int imageCacheIndex)
+        protected virtual IEnumerator ConstructUnityTexture(byte[] buffer, bool markGpuOnly, bool linear, int imageCacheIndex)
         {
             Texture2D texture = new Texture2D(0, 0, TextureFormat.ARGB32, true, linear);
 
@@ -769,7 +766,7 @@ namespace UnityGLTF
             {
                 using (MemoryStream memoryStream = stream as MemoryStream)
                 {
-                    yield return ConstructUnityTexture(memoryStream.ToArray(), false, linear, image, imageCacheIndex);
+                    yield return ConstructUnityTexture(memoryStream.ToArray(), false, linear, imageCacheIndex);
                 }
             }
 
@@ -778,7 +775,7 @@ namespace UnityGLTF
                 using (MemoryStream memoryStream = new MemoryStream())
                 {
                     fileStream.CopyTo(memoryStream);
-                    yield return ConstructUnityTexture(memoryStream.ToArray(), false, linear, image, imageCacheIndex);
+                    yield return ConstructUnityTexture(memoryStream.ToArray(), false, linear, imageCacheIndex);
                 }
             }
         }
@@ -2466,12 +2463,12 @@ namespace UnityGLTF
 
             int sourceId = GetTextureSourceId(texture);
             GLTFImage image = _gltfRoot.Images[sourceId];
-
+            string imageId = GenerateImageId(image.Uri, sourceId);
             RefCountedTextureData source = null;
 
-            if (image.Uri != null && PersistentAssetCache.HasImage(image.Uri, id))
+            if (PersistentAssetCache.HasImage(imageId))
             {
-                source = PersistentAssetCache.GetImage(image.Uri, id);
+                source = PersistentAssetCache.GetImage(imageId);
                 _assetCache.ImageCache[sourceId] = source.Texture;
 
                 if (_assetCache.ImageCache[sourceId] == null)
@@ -2492,11 +2489,11 @@ namespace UnityGLTF
 
                 if (addImagesToPersistentCaching)
                 {
-                    source = PersistentAssetCache.AddImage(image.Uri, id, _assetCache.ImageCache[sourceId]);
+                    source = PersistentAssetCache.AddImage(imageId, _assetCache.ImageCache[sourceId]);
                 }
                 else
                 {
-                    source = new RefCountedTextureData(PersistentAssetCache.GetCacheId(image.Uri, id), _assetCache.ImageCache[sourceId]);
+                    source = new RefCountedTextureData(imageId, _assetCache.ImageCache[sourceId]);
                 }
             }
 
@@ -2556,7 +2553,7 @@ namespace UnityGLTF
                     // NOTE(Brian): This breaks importing in edit mode, so only enable it for runtime.
                     unityTexture.Apply(false, true);
 #endif
-                    _assetCache.TextureCache[textureIndex].CachedTexture = new RefCountedTextureData(PersistentAssetCache.GetCacheId(image.Uri, id), unityTexture);
+                    _assetCache.TextureCache[textureIndex].CachedTexture = new RefCountedTextureData(imageId, unityTexture);
                 }
                 else
                 {
@@ -2630,76 +2627,31 @@ namespace UnityGLTF
             return partialPath;
         }
 
-        public static Vector2 GLTFOffsetToUnitySpace(Vector2 offset, float textureYScale)
+        public static Vector2 GLTFOffsetToUnitySpace(Vector2 offset, float textureYScale) { return new Vector2(offset.x, 1 - textureYScale - offset.y); }
+
+        private string GenerateImageId(string uri, int sourceId)
         {
-            return new Vector2(offset.x, 1 - textureYScale - offset.y);
-        }
-        
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="uri"></param>
-        /// <returns></returns>
-        public bool ImageIsInGlobalCache(string uri)
-        {
-            uri = $"{uri}@{id}";
-            bool result = PersistentAssetCache.ImageCacheByUri.ContainsKey(uri);
-            return result;
+            if (string.IsNullOrEmpty(uri))
+            {
+                return PersistentAssetCache.GetCacheId($"embedded{sourceId}", id);
+            }
+
+            if (GetAssetContentHash(uri, out string imageHash))
+            {
+                return imageHash;
+            }
+
+            return PersistentAssetCache.GetCacheId(uri, id);
         }
 
-        public string GetCacheId(string uri)
+        private bool GetAssetContentHash(string uri, out string hash)
         {
-            return $"{uri}@{id}";
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="uri"></param>
-        /// <returns></returns>
-        public RefCountedTextureData GetGlobalCachedImage(string uri)
-        {
-            return PersistentAssetCache.ImageCacheByUri[GetCacheId(uri)];
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="uri"></param>
-        /// <param name="refCountedTexture"></param>
-        public void AddGlobalCachedImage(string uri, RefCountedTextureData refCountedTexture)
-        {
-            PersistentAssetCache.ImageCacheByUri[GetCacheId(uri)] = refCountedTexture;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="uri"></param>
-        /// <returns></returns>
-        public bool BufferIsInGlobalCache(string uri)
-        {
-            return PersistentAssetCache.StreamCacheByUri.ContainsKey(GetCacheId(uri));
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="uri"></param>
-        /// <returns></returns>
-        public RefCountedStreamData GetCachedBuffer(string uri)
-        {
-            return PersistentAssetCache.StreamCacheByUri[GetCacheId(uri)];
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="uri"></param>
-        /// <param name="refCountedStream"></param>
-        public void AddCachedBuffer(string uri, RefCountedStreamData refCountedStream)
-        {
-            PersistentAssetCache.StreamCacheByUri[GetCacheId(uri)] = refCountedStream;
+            if (_loader.assetIdConverter != null)
+            {
+                return _loader.assetIdConverter(uri, out hash);
+            }
+            hash = uri;
+            return false;
         }
     }
 }

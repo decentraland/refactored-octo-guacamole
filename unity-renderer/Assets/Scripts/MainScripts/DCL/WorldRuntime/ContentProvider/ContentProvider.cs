@@ -184,5 +184,23 @@ namespace DCL
 #endif
             return false;
         }
+
+        public bool TryGetContentHash(string file, out string result)
+        {
+            result = string.Empty;
+
+            if (fileToHash == null)
+            {
+                result = file;
+                return true;
+            }
+
+            if (fileToHash.TryGetValue(file.ToLower(), out result))
+            {
+                return true;
+            }
+
+            return false;
+        }
     }
 }
